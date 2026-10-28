@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BudgetBites">
+<meta name="theme-color" content="#2f7d4f">
+<link rel="apple-touch-icon" href="icon-512.png">
+<link rel="manifest" href="manifest.json">
+<title>BudgetBites – Daily Meal Planner</title>
+<style>
+:root{--bg:#f6f7f2;--card:#fff;--tx:#1d2a1f;--mu:#5f6b61;--ac:#2f7d4f;--ac2:#e6f2ea;--bd:#dfe4da;--warn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111611;--card:#1a221b;--tx:#e8efe9;--mu:#9aa89d;--ac:#4fae75;--ac2:#1f3326;--bd:#2c382d;--warn:#f59e0b}}
+:root[data-theme="dark"]{--bg:#111611;--card:#1a221b;--tx:#e8efe9;--mu:#9aa89d;--ac:#4fae75;--ac2:#1f3326;--bd:#2c382d;--warn:#f59e0b}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:760px;margin:0 auto;padding:14px;padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px))}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:16px;margin:0 0 8px}
+.sub{color:var(--mu);font-size:13px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
+input,select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-width:0;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6b61' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+button{font:inherit;cursor:pointer;-webkit-touch-callout:none;user-select:none}
+.chips{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.chip{flex:0 0 auto;min-width:58px;text-align:center;padding:7px 8px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:13px}
+.chip small{display:block;opacity:.8}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:8px;border:1px solid var(--ac);background:var(--ac2);color:var(--tx)}
+.ck{flex-direction:row;align-items:center;gap:5px;font-size:13px;color:var(--tx)}
+.stat{background:var(--ac2);border-radius:10px;padding:8px 10px}.stat b{display:block;font-size:18px}.stat span{font-size:12px;color:var(--mu)}
+.bar{height:8px;border-radius:5px;background:var(--bd);overflow:hidden;margin:3px 0 9px}.bar i{display:block;height:100%;background:var(--ac)}
+.meal h3{margin:0;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ac)}
+.meta{font-size:12px;color:var(--mu)}
+ul,ol{margin:6px 0;padding-left:20px}li{margin:2px 0}
+.warn{color:var(--warn);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 4px;border-bottom:1px solid var(--bd);text-align:left}td:last-child,th:last-child{text-align:right}
+.best{color:var(--ac);font-weight:600}
+.note{font-size:12px;color:var(--mu)}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:2px;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.nv{flex:1;border:0;background:none;color:var(--mu);font-size:11px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:10px}
+.nv b{font-size:18px;font-weight:400}.nv.on{color:var(--ac);font-weight:600;background:var(--ac2)}
+</style></head><body><div class="wrap">
+<h1>🥗 BudgetBites</h1>
+<p class="sub">Healthy daily meals built to your goal, calories and grocery budget.</p>
+
+<div class="card pg" data-p="profile"><h2>Your profile</h2>
+<div class="grid">
+<label>Sex<select id="sex"><option value="m">Male</option><option value="f">Female</option></select></label>
+<label>Age<input id="age" type="number" min="14" max="90"></label>
+<label>Height (ft)<input id="ft" type="number" min="3" max="7"></label>
+<label>Height (in)<input id="inch" type="number" min="0" max="11"></label>
+<label>Weight (lb)<input id="wt" type="number" min="80" max="500"></label>
+<label>Portions cooked<input id="pp" type="number" min="1" max="8"></label>
+<label>Activity<select id="act"><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
+<label>Goal<select id="goal"><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
+<label>Body archetype<select id="arch"><option value="auto">Auto (from BMI)</option><option value="ecto">Ectomorph (lean, hard gainer)</option><option value="meso">Mesomorph (athletic)</option><option value="endo">Endomorph (gains easily)</option></select></label>
+</div>
+<div class="row" style="margin-top:10px"><span class="meta">Meals to plan (budget splits evenly):</span><span id="meals" class="row"></span></div>
+<div class="row" style="margin-top:10px"><label>How often do you shop?<select id="trip"><option value="1">Every day</option><option value="2">Every 2 days</option><option value="3">Every 3 days</option><option value="7">Once a week (meal prep)</option></select></label><span class="note">Your budget below is for one shopping trip, spread across all the meals in it, with a different recipe each day.</span></div>
+<div class="row" style="margin-top:10px"><label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label></div>
+<div class="row" style="margin-top:10px"><label>Beverage with meals<select id="bev"><option value="">None</option><option value="water">Water</option><option value="tea">Unsweetened tea</option><option value="coffee">Black coffee</option><option value="milk">Milk (2%)</option><option value="sparkling">Sparkling water</option><option value="soda">Healthy soda (low sugar)</option><option value="wine">Wine (21+)</option></select></label><span class="note" id="bevnote"></span></div>
+<div class="row" style="margin-top:10px"><span class="meta">Shop at:</span><span id="stores" class="row"></span></div>
+</div>
+
+<div id="plan"></div>
+<p class="note">Prices are built-in estimates for whole packages (a web page can’t scrape live retailer sites), so treat totals as a guide. Calorie and macro bars are per person. Pantry carry-over assumes leftovers keep, so freeze meat and use fresh items first. Nutrition uses the Mifflin-St Jeor formula and standard food data. This is general guidance, not medical advice.</p>
+</div>
+<nav class="nav"><button class="nv" data-p="profile" onclick="go('profile')"><b>👤</b>Profile</button><button class="nv" data-p="plan" onclick="go('plan')"><b>📋</b>Plan</button><button class="nv" data-p="meals" onclick="go('meals')"><b>🍳</b>Meals</button><button class="nv" data-p="shop" onclick="go('shop')"><b>🛒</b>Shop</button><button class="nv" data-p="week" onclick="go('week')"><b>📅</b>Week</button></nav>
+<script>
+function triggerHaptic(type) {
+  try {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.haptic) {
+      window.webkit.messageHandlers.haptic.postMessage(type || "light");
+    } else if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  } catch(e) {}
+}
+
+const ST=["Walmart","Aldi","Kroger","Costco"],DY=[0,1,2,3,4,5,6].map(i=>["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][((new Date().getDay()+6)%7+i)%7]);
+// [amount, unit label, kcal, P, C, F, Walmart, Aldi, Kroger, Costco] per serving
+const I={
+eggs:[1,"large eggs",72,6.3,.4,4.8,.20,.17,.22,.15],
+oats:[.5,"cup rolled oats (dry)",150,5,27,3,.13,.10,.14,.09],
+banana:[1,"medium banana",105,1.3,27,.4,.25,.22,.28,.24],
+milk:[1,"cup 2% milk",120,8,12,5,.30,.26,.33,.24],
+yog:[.75,"cup plain nonfat Greek yogurt",100,17,6,0,.75,.65,.80,.62],
+chick:[4,"oz chicken breast (raw)",120,26,0,1.5,.85,.75,.95,.70],
+turk:[4,"oz 93% lean ground turkey",170,21,0,9,.95,.85,1.05,.80],
+tuna:[1,"can tuna (5 oz)",120,26,0,1,1.00,.85,1.10,.80],
+bean:[.5,"cup canned black beans",110,7,20,.5,.35,.30,.38,.28],
+lent:[.25,"cup dry lentils",170,12,30,.5,.25,.22,.27,.20],
+rice:[.25,"cup brown rice (dry)",170,4,36,1.5,.18,.15,.20,.13],
+bread:[2,"slices whole wheat bread",160,8,28,2,.35,.28,.38,.30],
+sweet:[1,"medium sweet potato",110,2,26,0,.55,.50,.60,.45],
+pasta:[2,"oz whole wheat pasta (dry)",200,7,41,1.5,.25,.20,.27,.22],
+broc:[1,"cup frozen broccoli",50,4,9,.5,.45,.40,.50,.38],
+spin:[1,"cup frozen spinach",40,5,6,.5,.50,.45,.55,.40],
+mix:[1,"cup frozen mixed vegetables",80,3,16,.5,.40,.35,.42,.32],
+carrot:[1,"cup carrots",50,1,12,0,.30,.28,.32,.25],
+tom:[.5,"cup canned diced tomatoes",25,1,5,0,.28,.24,.30,.22],
+onion:[.5,"medium onion",22,.6,5,0,.20,.18,.22,.15],
+pb:[2,"tbsp peanut butter",190,7,7,16,.22,.18,.25,.15],
+oil:[1,"tbsp olive oil",120,0,0,14,.20,.18,.22,.14],
+apple:[1,"medium apple",95,.5,25,.3,.70,.60,.75,.55],
+ched:[1,"oz cheddar cheese",110,7,0,9,.45,.38,.48,.35],
+tort:[1,"whole wheat tortilla",130,4,22,3,.22,.18,.25,.17],
+whey:[1,"scoop whey protein",120,24,3,1.5,.90,.85,.95,.70],
+cott:[.5,"cup low-fat cottage cheese",90,12,5,2.5,.55,.48,.60,.45],
+berry:[1,"cup frozen berries",70,1,17,.5,.85,.75,.90,.60],
+salmon:[4,"oz salmon fillet (raw)",180,25,0,8,2.10,1.95,2.20,1.70],
+avocado:[.5,"avocado",120,1.5,6,11,.55,.50,.60,.45],
+almond:[1,"oz almonds",165,6,6,14,.55,.50,.58,.40],
+quinoa:[.25,"cup dry quinoa",170,6,30,2.5,.30,.27,.32,.22],
+tea:[1,"unsweetened tea bag",0,0,0,0,.05,.04,.05,.04],
+coffee:[1,"cup brewed black coffee (grounds)",5,.3,0,0,.15,.13,.16,.10],
+sparkling:[1,"can sparkling water (12 oz)",0,0,0,0,.35,.30,.33,.28],
+soda:[1,"can low-sugar prebiotic soda (12 oz)",35,0,9,0,1.50,1.60,1.60,1.25],
+wine:[1,"glass dry wine (5 oz)",125,.1,4,0,2.20,1.90,2.30,1.80]};
+// Store pricing recalibrated to a July 2026 store-brand basket study (Kroger cheapest, then Walmart, then Aldi; Aldi strong on dairy; Kroger lowest on eggs, tomatoes, pasta). Costco left as estimated.
+(()=>{const dairy=['milk','yog','cott','ched'],krLow=['eggs','tom','pasta'];for(const k in I){const x=I[k],w=x[6];x[8]=+(w*(krLow.includes(k)?.9:.96)).toFixed(3);x[7]=+(w*(dairy.includes(k)?.88:1.07)).toFixed(3)}})();
+// [servings per package, package label]: shoppers pay for whole packages
+const PK={eggs:[12,"dozen large eggs"],oats:[13,"18 oz rolled oats"],banana:[3,"bananas (3)"],milk:[8,"half gallon 2% milk"],yog:[5,"32 oz plain Greek yogurt"],chick:[4,"1 lb chicken breast"],turk:[4,"1 lb 93% ground turkey"],tuna:[1,"can tuna (5 oz)"],bean:[3,"15 oz can black beans"],lent:[9,"1 lb dry lentils"],rice:[9,"1 lb brown rice"],bread:[10,"loaf whole wheat bread"],sweet:[2,"sweet potatoes (2)"],pasta:[8,"16 oz whole wheat pasta"],broc:[3,"12 oz frozen broccoli"],spin:[2,"10 oz frozen spinach"],mix:[3,"12 oz frozen mixed veg"],carrot:[4,"1 lb carrots"],tom:[3,"14.5 oz can diced tomatoes"],onion:[2,"onion"],pb:[14,"16 oz peanut butter"],oil:[16,"8 oz olive oil"],apple:[3,"apples (3)"],ched:[8,"8 oz cheddar block"],tort:[8,"8-ct whole wheat tortillas"],whey:[30,"2 lb whey protein"],cott:[4,"16 oz cottage cheese"],berry:[3,"12 oz frozen berries"],salmon:[4,"1 lb salmon fillets"],avocado:[4,"avocados (2)"],almond:[8,"8 oz almonds"],quinoa:[8,"12 oz quinoa"],tea:[20,"20-ct tea bags"],coffee:[30,"12 oz ground coffee"],sparkling:[12,"12-pack sparkling water"],soda:[12,"12-pack prebiotic soda"],wine:[5,"750 ml bottle dry wine"]};
+const pkP=(k,i)=>Math.round(I[k][6+i]*PK[k][0]*100)/100;
+const NP=()=>Math.max(1,Math.round(S.p.pp)||1);
+const BEV={water:'',tea:'tea',coffee:'coffee',milk:'milk',sparkling:'sparkling',soda:'soda',wine:'wine'};
+const BSUG={water:"Add lemon, lime or cucumber slices.",tea:"Try green tea, hibiscus or peppermint, unsweetened.",coffee:"Drink it black or with a splash of milk; skip sugary creamers.",milk:"Choose plain low-fat or lactose-free milk.",sparkling:"Try Topo Chico, LaCroix, Spindrift or a store-brand seltzer with a squeeze of lemon or lime.",soda:"Try Poppi, Olipop or Culture Pop (about 25 to 50 kcal and 2 to 5 g sugar per can; check the label).",wine:"Pair it with the meal: a dry white like Sauvignon Blanc with fish, Pinot Noir with chicken or turkey, or a dry red with beans and lentils. One 5 oz glass."};
+const RICE="Start the rice first: simmer it in twice its volume of water, covered, about 40 minutes.";
+const STEPS={
+'PB Banana Oatmeal':[8,"Bring the milk to a gentle simmer in a small pot.|Stir in the oats and cook 3 to 4 minutes, stirring often, until thick.|Slice the banana over the top and swirl in the peanut butter."],
+'Veggie Egg Scramble & Toast':[10,"Toast the bread.|Warm a nonstick pan over medium heat and add the spinach for 1 minute.|Pour in the beaten eggs and stir gently until just set, about 3 minutes.|Top with the cheese and serve with the toast."],
+'Berry Yogurt Oat Bowl':[5,"Stir the oats into the yogurt.|Top with thawed berries.|Rest 5 minutes so the oats soften."],
+'Egg & Bean Breakfast Burrito':[12,"Warm the beans in a small pan and lightly mash them.|Scramble the eggs over medium heat until just set.|Warm the tortilla 20 seconds per side.|Fill with eggs, beans and cheese, then roll tightly."],
+'Banana Oat Pancakes':[15,"Blend the oats, eggs and banana until smooth.|Heat a lightly oiled nonstick pan over medium heat.|Pour small pancakes and cook 2 minutes per side until golden."],
+'Cottage Cheese Toast & Apple':[5,"Toast the bread.|Spread the cottage cheese on top.|Serve with the sliced apple."],
+'Sweet Potato Egg Hash':[20,"Dice the sweet potato and onion into small cubes.|Cook in the oil over medium heat, covered, 10 to 12 minutes until tender.|Make wells in the hash, crack in the eggs and cover 3 to 4 minutes until set."],
+'Overnight Berry Oats':[5,"Mix the oats, milk, yogurt and berries in a jar.|Refrigerate overnight (at least 4 hours).|Stir and eat cold, or warm it in the microwave."],
+'Banana Oatmeal':[8,"Bring 1 cup of water per serving to a simmer.|Stir in the oats and cook 4 minutes.|Top with sliced banana."],
+'Egg & Toast':[8,"Toast the bread.|Scramble or fry the eggs in a nonstick pan over medium heat.|Serve on or beside the toast."],
+'Avocado Egg Toast':[10,"Toast the bread.|Mash the avocado with a pinch of salt and spread it on top.|Fry or poach the eggs 3 to 4 minutes and place on the toast."],
+'Almond Berry Yogurt Bowl':[5,"Spoon the yogurt into a bowl.|Add the berries, oats and chopped almonds.|Eat right away, or rest 5 minutes to soften the oats."],
+'Tuna Rice Bowl':[40,RICE+"|Steam the broccoli 4 to 5 minutes.|Drain and flake the tuna over the rice and broccoli, then drizzle with olive oil."],
+'Chicken & Sweet Potato Plate':[35,"Heat the oven to 425°F. Cube the sweet potato, toss with half the oil and roast 25 minutes.|Season the chicken and sear in the remaining oil 5 to 6 minutes per side until it reaches 165°F inside.|Steam the broccoli 4 minutes and plate everything."],
+'Lentil Veggie Stew':[35,"Saute the chopped onion in the oil 4 minutes.|Add the lentils, carrots, tomatoes and about 2 cups of water.|Simmer covered 25 minutes until the lentils are tender, adding water if needed.|Season with salt and pepper."],
+'Turkey Burrito Bowl':[40,RICE+"|Brown the turkey 6 to 8 minutes until cooked through (165°F) and season with chili powder.|Warm the beans and tomatoes together.|Serve the turkey, beans and tomatoes over the rice."],
+'Chicken Burrito Bowl':[40,RICE+"|Sear sliced chicken 5 to 6 minutes per side until it reaches 165°F.|Warm the beans and tomatoes together.|Serve the chicken, beans and tomatoes over the rice."],
+'Tuna Pasta Salad':[15,"Boil the pasta about 9 minutes, drain and rinse with cold water.|Shred or dice the carrot.|Toss the pasta with the drained tuna, carrot and olive oil.|Season with pepper and eat cold."],
+'Turkey Veggie Wrap':[15,"Brown the turkey 6 to 8 minutes until cooked through (165°F).|Warm the vegetables in the pan 2 minutes.|Warm the tortillas, fill with turkey, vegetables and cheese, and roll."],
+'Egg Fried Rice':[40,RICE+" Day-old chilled rice works best.|Scramble the eggs in a hot oiled pan, then push them aside.|Add the vegetables and rice and stir-fry 4 to 5 minutes until hot."],
+'Rice & Beans':[40,RICE+"|Simmer the beans and tomatoes with chili powder and salt for 10 minutes.|Spoon over the rice."],
+'Lentils & Rice':[40,RICE+"|Rinse the lentils and simmer in water 20 minutes until tender, then drain.|Serve over the rice with salt and pepper."],
+'Simple Tuna Rice':[40,RICE+"|Drain the tuna and flake it over the hot rice.|Season with pepper and a squeeze of lemon if you have it."],
+'Salmon Quinoa Bowl':[25,"Rinse the quinoa and simmer in twice its volume of water, covered, 15 minutes; rest 5 minutes and fluff.|Pat the salmon dry, season, and sear in oil 4 minutes per side until it reaches 145°F.|Steam the broccoli 4 minutes and assemble the bowl."],
+'Chicken Avocado Quinoa Bowl':[30,"Cook the quinoa (15 minutes, then rest 5).|Sear the chicken 5 to 6 minutes per side until it reaches 165°F, then slice.|Warm the beans.|Top the quinoa with chicken, beans and sliced avocado."],
+'Chicken Veggie Pasta':[25,"Boil the pasta about 9 minutes and drain.|Sear sliced chicken in the oil 6 to 7 minutes until cooked through (165°F).|Add the vegetables and tomatoes and simmer 4 minutes.|Toss with the pasta."],
+'Turkey Bean Chili':[35,"Brown the turkey with the chopped onion 8 minutes until cooked through (165°F).|Add the beans, tomatoes, chili powder and salt.|Simmer 20 minutes, stirring occasionally."],
+'Chicken Veggie Stir-Fry':[45,RICE+"|Slice the chicken into thin strips and stir-fry in hot oil 5 to 6 minutes until cooked through (165°F).|Add the vegetables and cook 4 minutes.|Serve over the rice."],
+'Lentil Spinach Rice Bowl':[45,RICE+"|Simmer the lentils 20 minutes and drain.|Wilt the spinach in the oil 2 minutes.|Fry the eggs, then stack everything over the rice."],
+'Baked Chicken, Sweet Potato & Greens':[35,"Heat the oven to 425°F.|Cube the sweet potato and roast with half the oil 10 minutes, then add the seasoned chicken.|Bake 15 to 20 minutes more until the chicken reaches 165°F.|Wilt the spinach in the remaining oil 2 minutes and serve."],
+'Turkey Meat Sauce Spaghetti':[30,"Boil the pasta about 9 minutes and drain.|Brown the turkey with the chopped onion 8 minutes until cooked through (165°F).|Add the tomatoes and simmer 12 minutes.|Serve the sauce over the pasta."],
+'Lentil Curry Bowl':[45,RICE+"|Saute the onion 4 minutes, stir in curry powder, then add the lentils, tomatoes and 2 cups of water.|Simmer 25 minutes until soft.|Stir in the spinach for 2 minutes and serve over the rice."],
+'Black Bean Sweet Potato Bowl':[35,"Heat the oven to 425°F and roast cubed sweet potato 25 minutes.|Warm the beans with a pinch of chili powder.|Wilt the spinach in a dry pan 2 minutes.|Combine in a bowl and top with the cheese."],
+'Chicken & Broccoli Rice':[45,RICE+"|Sear sliced chicken in the oil 6 to 7 minutes until cooked through (165°F).|Steam the broccoli 4 minutes and toss with the chicken.|Serve over the rice."],
+'Bean & Tomato Pasta':[20,"Boil the pasta about 9 minutes and drain.|Simmer the beans and tomatoes 10 minutes with salt and pepper.|Toss with the pasta."],
+'Lentil Tomato Pasta':[30,"Simmer the lentils 20 minutes until soft and drain.|Boil the pasta about 9 minutes.|Warm the lentils with the tomatoes 5 minutes and toss with the pasta."],
+'Rice, Beans & Egg':[45,RICE+"|Warm the beans with a pinch of salt.|Fry the eggs 3 to 4 minutes.|Serve the beans over the rice and top with the eggs."],
+'Baked Salmon, Sweet Potato & Greens':[35,"Heat the oven to 400°F and roast cubed sweet potato 10 minutes.|Add the seasoned salmon and bake 12 to 15 minutes until it reaches 145°F.|Wilt the spinach in the oil 2 minutes and serve."],
+'Turkey Quinoa Veggie Skillet':[30,"Cook the quinoa (15 minutes, then rest 5).|Brown the turkey 6 to 8 minutes until cooked through (165°F).|Add the vegetables and tomatoes and simmer 6 minutes.|Serve over the quinoa."]};
+// Beginner-friendly techniques, reused across recipes. [title, detail, equipment]
+const TECH={
+rice:["Cook the brown rice (start this first)","Measure the dry rice from your ingredient list and rinse it in a strainer under cold water for 30 seconds. Put it in a pot with twice as much water (1 cup rice to 2 cups water) and a pinch of salt. Bring to a boil over high heat, then turn the heat to low, put the lid on and leave it alone for 40 minutes without lifting the lid. Turn off the heat, keep the lid on 5 more minutes, then fluff with a fork. It is done when all the water is absorbed and the grains are tender.","pot with lid, strainer"],
+quinoa:["Cook the quinoa","Rinse the dry quinoa in a fine strainer for 30 seconds to remove its bitter coating. Put it in a pot with twice as much water (1 cup quinoa to 2 cups water) and a pinch of salt. Bring to a boil, turn the heat to low, cover and cook 15 minutes, until the water is absorbed and you can see tiny curly tails. Turn off the heat, leave it covered 5 minutes, then fluff with a fork.","pot with lid, fine strainer"],
+pasta:["Boil the pasta","Fill a large pot about two-thirds full of water, add a big pinch of salt, and bring it to a rolling boil (large, constant bubbles) over high heat. Add the pasta and stir for the first minute so it does not stick. Cook 8 to 10 minutes, tasting at 8: it should be tender with a slight bite. Scoop out 1/2 cup of the cooking water, then carefully drain the pasta in a colander in the sink (the steam is hot).","large pot, colander"],
+lentils:["Cook the lentils","Rinse the dry lentils in a strainer and pick out any small stones. Put them in a pot with 3 times as much water (1 cup lentils to 3 cups water) and bring to a boil. Lower to a gentle simmer, partly cover, and cook 20 minutes, until soft but still holding their shape. Drain any extra water.","pot, strainer"],
+chicken:["Cook the chicken","Wash your hands, then pat the chicken dry with a paper towel so it browns instead of steaming. Cut it into strips or bite-size pieces if you like, and season both sides with salt, pepper and any spices you have (garlic powder or paprika work well). Heat a nonstick pan over medium-high heat for 2 minutes, adding the olive oil from your list if there is one. Lay the chicken in a single layer without crowding and cook 5 to 6 minutes per side, until golden. Check the thickest piece with a food thermometer: it must read 165°F and be white inside with no pink. Rest it 3 minutes. Wash your hands, the knife and the cutting board with hot soapy water afterward.","nonstick pan, food thermometer, knife and cutting board"],
+turkey:["Brown the ground turkey","Heat a large pan over medium-high heat for 2 minutes. Add the turkey and break it into small crumbles with a spoon. Cook 7 to 8 minutes, stirring every minute or so, until no pink is left and it reads 165°F on a food thermometer. Season with salt and pepper (and chili powder if the recipe uses it). Spoon out extra liquid if it pools in the pan. Wash your hands after touching raw meat.","large pan, spoon, food thermometer"],
+veg:["Steam the frozen vegetables","Put the frozen vegetables in a microwave-safe bowl with 2 tablespoons of water and cover with a plate. Microwave 3 to 4 minutes, stir, and check that they are hot and tender (add 1 more minute if needed). No microwave? Put them in a pan with 2 tablespoons of water, cover, and cook over medium heat 5 minutes. Drain off any water and add a pinch of salt.","microwave-safe bowl and plate"],
+spinach:["Wilt the spinach","Thaw the frozen spinach in the microwave for 1 minute, then squeeze out as much water as you can with your hands or a clean towel. Heat the oil from your list (if any) in a pan over medium heat, add the spinach and stir 2 minutes until hot. Season with salt and pepper.","pan"],
+sweet:["Roast the sweet potato","Heat the oven to 425°F. Scrub the sweet potato under running water and cut it into cubes about 3/4 inch wide (smaller cubes cook faster). Toss them on a baking sheet with the oil from your list and a pinch of salt, and spread into one layer so the pieces do not touch. Roast 25 minutes, flipping them halfway, until a fork slides in easily and the edges are browned.","oven, baking sheet, knife and cutting board"],
+scramble:["Scramble the eggs","Crack the eggs into a bowl and beat with a fork for 30 seconds with a pinch of salt. Heat a nonstick pan over medium-low heat for 1 minute with a little oil or butter if you have it. Pour in the eggs, wait 20 seconds, then gently push them across the pan with a spatula. Keep folding for 2 to 3 minutes. Take the pan off the heat while the eggs still look slightly shiny, because they keep cooking on their own. They are done when no runny liquid is left.","nonstick pan, spatula, bowl and fork"],
+fry:["Fry the eggs","Heat a nonstick pan over medium-low heat for 1 minute with a little oil. Crack each egg into a small bowl first, then slide it into the pan so no shell gets in. Cook 2 to 3 minutes until the whites are completely white and firm. For a firmer yolk, flip the egg gently and cook 30 more seconds, or cover the pan for 1 minute.","nonstick pan, spatula"],
+toast:["Toast the bread","Put the bread in a toaster on a medium setting for 2 to 3 minutes until golden. No toaster? Toast it in a dry pan over medium heat, about 2 minutes per side.","toaster or pan"],
+beans:["Prepare the beans","Open the can, pour the beans into a strainer and rinse under cold water for 30 seconds to wash off the salty liquid. Warm them in a small pot over medium heat with a splash of water, stirring now and then for 3 to 4 minutes until hot. Season with a pinch of salt and pepper.","can opener, strainer, small pot"],
+tuna:["Drain and flake the tuna","Open the can and press the lid down against the tuna while you tip the can over the sink to drain the liquid. Break the tuna into flakes with a fork.","can opener, fork"],
+tort:["Warm the tortillas","Heat a dry pan over medium heat and warm each tortilla 20 to 30 seconds per side until soft. Or wrap them in a damp paper towel and microwave 20 seconds. Warm tortillas bend without tearing.","pan or microwave"],
+salmonsear:["Pan-sear the salmon","Pat the salmon dry with a paper towel and season both sides with salt and pepper. Heat the oil from your list in a nonstick pan over medium-high heat until it shimmers. Lay the salmon in the pan and cook 4 minutes without moving it, then flip and cook 3 to 4 more minutes. It is done at 145°F or when it flakes easily with a fork. Wash your hands after handling raw fish.","nonstick pan, food thermometer"],
+salmonbake:["Bake the salmon","Pat the salmon dry, rub it with a little of the oil and season with salt and pepper. Place it on the baking sheet next to the sweet potato and bake at 400°F for 12 to 15 minutes. It is done at 145°F or when it flakes easily with a fork. Wash your hands after handling raw fish.","oven, baking sheet, food thermometer"],
+onion:["Chop the onion","Cut off both ends, peel off the papery skin, and cut the onion in half from top to bottom. Lay a half flat-side down and slice it into thin strips, then turn it and cut across to make small pieces. Chilling the onion for 10 minutes first helps reduce tears.","knife and cutting board"]};
+const li=s=>{if(s[0]==='@'){const t=TECH[s.slice(1)];return`<li><b>${t[0]}.</b> ${t[1]}</li>`}const i=s.indexOf(': ');return i>0&&i<45?`<li><b>${s.slice(0,i)}.</b> ${s.slice(i+2)}</li>`:`<li>${s}</li>`};
+function stepsHTML(n){const z=STEPS[n],a=z[1].split('|'),eq=[...new Set(a.filter(s=>s[0]==='@').flatMap(s=>TECH[s.slice(1)][2].split(', ')))];
+return`<div class="tag" style="margin-top:8px">How to cook · about ${z[0]} min</div><div class="meta">Before you start: wash your hands, read every step once, and measure out your ingredients (amounts are listed above).${eq.length?'<br>You will need: '+eq.join(', ')+'.':''}</div><ol>${a.map(li).join('')}</ol>`}
+Object.assign(STEPS,{
+'PB Banana Oatmeal':[8,"Heat the milk: Pour the milk into a small pot and warm over medium heat 2 minutes, until small bubbles form at the edges. Do not let it boil over.|Cook the oats: Stir in the oats, lower the heat, and cook 3 to 4 minutes, stirring often, until thick and creamy.|Add toppings: Pour into a bowl, slice the banana on top, and stir in the peanut butter."],
+'Veggie Egg Scramble & Toast':[12,"@toast|Warm the spinach: Microwave the frozen spinach 1 minute, squeeze out the water, then cook it in a nonstick pan over medium heat for 1 minute.|@scramble|Finish: Sprinkle the cheese over the eggs for the last 30 seconds so it melts, then serve with the toast."],
+'Berry Yogurt Oat Bowl':[7,"Thaw the berries: Leave them in a bowl on the counter 10 minutes, or microwave 30 seconds.|Mix the base: Spoon the yogurt into a bowl and stir in the oats.|Top and wait: Add the berries and let it sit 5 minutes so the oats soften."],
+'Egg & Bean Breakfast Burrito':[15,"@beans|Mash the beans: Mash about half of them with a fork so the burrito holds together.|@scramble|@tort|Assemble: Lay a tortilla flat, put the eggs, beans and cheese in the middle, fold the sides in, then roll up from the bottom."],
+'Banana Oat Pancakes':[20,"Blend the batter: Blend the oats, eggs and banana 30 seconds until smooth. No blender? Mash the banana very well and whisk it with the eggs and oats.|Heat the pan: Warm a nonstick pan over medium heat for 2 minutes and lightly grease it.|Cook: Pour small pancakes about 3 inches wide. Cook 2 minutes, until bubbles form on top and the edges look set, then flip and cook 1 to 2 minutes more until golden.|Serve: Stack and eat warm."],
+'Cottage Cheese Toast & Apple':[7,"@toast|Add the topping: Spread the cottage cheese on the toast.|Slice the apple: Cut it in half, scoop out the core with a spoon, and slice into wedges to serve alongside."],
+'Sweet Potato Egg Hash':[25,"@onion|Prep the sweet potato: Scrub it and cut it into small 1/2 inch cubes so they cook quickly.|Cook the hash: Heat the oil in a large nonstick pan over medium heat. Add the sweet potato and onion with a pinch of salt and pepper, cover, and cook 10 to 12 minutes, stirring every 3 minutes, until a fork slides in easily.|Add the eggs: Make small wells in the hash with a spoon and crack an egg into each. Cover and cook 3 to 4 minutes until the whites are firm."],
+'Overnight Berry Oats':[5,"Mix: Put the oats, milk, yogurt and berries in a jar or container with a lid and stir well.|Chill: Cover and refrigerate at least 4 hours or overnight (up to 3 days).|Serve: Stir and eat cold, or microwave 1 minute for a warm bowl."],
+'Banana Oatmeal':[8,"Boil the water: Bring 1 cup of water for every 1/2 cup of oats to a boil in a small pot.|Cook: Stir in the oats, lower the heat to medium-low, and cook 4 minutes, stirring often, until thick.|Top: Slice the banana over the top."],
+'Egg & Toast':[10,"@toast|@scramble|Serve: Put the eggs on or beside the toast."],
+'Avocado Egg Toast':[12,"@toast|Mash the avocado: Cut it in half around the pit, twist the halves apart, scoop out the flesh with a spoon and mash with a fork and a pinch of salt.|@fry|Assemble: Spread the avocado on the toast and place the eggs on top."],
+'Almond Berry Yogurt Bowl':[7,"Prep: Roughly chop the almonds. Thaw the berries 10 minutes or microwave 30 seconds.|Build: Spoon the yogurt into a bowl, then add the berries, oats and almonds.|Wait: Let it sit 5 minutes so the oats soften."],
+'Tuna Rice Bowl':[45,"@rice|@veg|@tuna|Assemble: Put the rice in a bowl, add the broccoli and tuna, and drizzle with the olive oil."],
+'Chicken & Sweet Potato Plate':[40,"@sweet|Timing: Put the chicken in the pan about 10 minutes after the sweet potato goes in the oven, so both finish together.|@chicken|@veg|Plate: Put the chicken, sweet potato and broccoli on a plate."],
+'Lentil Veggie Stew':[40,"@onion|Soften the onion: Heat the oil in a large pot over medium heat. Add the onion and cook 4 minutes, stirring, until soft and clear.|Prep the carrots: Wash and peel them with a vegetable peeler, then cut into coins about 1/4 inch thick.|Add everything: Rinse the lentils, then add the lentils, carrots, tomatoes (with juice), a pinch of salt and 2 cups of water for every 1 cup of dry lentils.|Simmer: Bring to a boil, lower the heat, cover, and cook 25 minutes, stirring now and then, until the lentils are soft. Add a splash of water if it gets too thick. Taste and add salt and pepper."],
+'Turkey Burrito Bowl':[45,"@rice|@turkey|@beans|Warm the tomatoes: Pour them into a small pot and heat 3 minutes.|Build the bowl: Spoon the rice into a bowl and top with the turkey, beans and tomatoes."],
+'Chicken Burrito Bowl':[45,"@rice|@chicken|@beans|Warm the tomatoes: Pour them into a small pot and heat 3 minutes.|Build the bowl: Spoon the rice into a bowl and top with the sliced chicken, beans and tomatoes."],
+'Tuna Pasta Salad':[20,"@pasta|Cool the pasta: Rinse it under cold water for 30 seconds so it stops cooking.|Prep the carrots: Wash and peel them, then shred on a box grater or cut into thin sticks.|@tuna|Mix: Toss the pasta, tuna and carrots in a bowl with the olive oil, salt and pepper. Eat right away or chill 30 minutes."],
+'Turkey Veggie Wrap':[25,"@turkey|@veg|@tort|Assemble: Spoon the turkey, vegetables and cheese in a line down the center of a tortilla. Fold in the two sides, then roll up from the bottom like a burrito."],
+'Egg Fried Rice':[45,"@rice|Tip: Rice that was cooked a day ahead and chilled fries best. If yours is fresh, spread it on a plate for 10 minutes to cool and dry.|@veg|@scramble|Fry it together: Heat the oil in a large pan over medium-high heat. Add the rice and vegetables and stir 4 to 5 minutes until steaming hot, then fold in the eggs. Season with salt, pepper and soy sauce if you have it."],
+'Rice & Beans':[45,"@rice|@beans|Add the tomatoes: Stir the tomatoes (with juice) into the beans and simmer 10 minutes over medium-low heat with chili powder and salt, until slightly thickened.|Serve: Spoon the beans over the rice."],
+'Lentils & Rice':[45,"@rice|@lentils|Serve: Spoon the lentils over the rice and season with salt, pepper and a squeeze of lemon if you have it."],
+'Simple Tuna Rice':[45,"@rice|@tuna|Serve: Fluff the hot rice, top with the tuna and season with black pepper and lemon if you have it."],
+'Salmon Quinoa Bowl':[30,"@quinoa|@salmonsear|@veg|Assemble: Spoon the quinoa into a bowl, add the broccoli, flake the salmon on top and drizzle with the remaining oil."],
+'Chicken Avocado Quinoa Bowl':[35,"@quinoa|@chicken|@beans|Slice the avocado: Cut it in half around the pit, twist the halves apart, remove the pit with a spoon, scoop out the flesh and slice it.|Build the bowl: Quinoa first, then sliced chicken, beans and avocado."],
+'Chicken Veggie Pasta':[30,"@pasta|@chicken|@veg|Make the sauce: Add the vegetables and tomatoes (with juice) to the chicken pan and simmer 4 minutes over medium heat.|Combine: Add the drained pasta to the pan and toss 1 minute. Splash in a little saved pasta water if it looks dry."],
+'Turkey Bean Chili':[40,"@onion|@turkey|Add the onion: Stir the chopped onion into the turkey for the last 4 minutes of browning.|@beans|Build the chili: Add the beans, tomatoes (with juice), 1 to 2 teaspoons of chili powder per serving, salt and 1 cup of water to the pot.|Simmer: Bring to a boil, lower the heat, and cook uncovered 20 minutes, stirring occasionally, until thick. Taste and adjust the salt."],
+'Chicken Veggie Stir-Fry':[50,"@rice|@chicken|@veg|Combine: Add the vegetables to the chicken pan with a splash of soy sauce if you have it and stir 2 minutes until hot.|Serve: Spoon over the rice."],
+'Lentil Spinach Rice Bowl':[50,"@rice|@lentils|@spinach|@fry|Build the bowl: Rice first, then lentils, then spinach, topped with the fried eggs."],
+'Baked Chicken, Sweet Potato & Greens':[40,"Roast the sweet potato: Heat the oven to 425°F. Cube the sweet potato, toss with half the oil and a pinch of salt on a baking sheet, and roast 10 minutes.|Add the chicken: Wash your hands, pat the chicken dry, season with salt and pepper and nestle it on the same sheet. Bake 15 to 20 minutes more, until the thickest part reads 165°F. Wash your hands, knife and board afterward.|@spinach|Plate: Serve the chicken with the sweet potato and spinach."],
+'Turkey Meat Sauce Spaghetti':[35,"@onion|@turkey|Add the onion: Stir the chopped onion into the turkey for the last 4 minutes of browning.|Make the sauce: Add the tomatoes (with juice) and a pinch of salt. Simmer on medium-low 12 minutes, stirring now and then.|@pasta|Serve: Spoon the sauce over the pasta."],
+'Lentil Curry Bowl':[50,"@rice|@onion|Cook the curry base: Heat the oil in a large pot over medium heat, cook the onion 4 minutes, then stir in 1 to 2 teaspoons of curry powder per serving for 30 seconds until fragrant.|Add the lentils: Rinse the lentils and add them with the tomatoes (with juice), salt and 2 cups of water for every 1 cup of dry lentils. Bring to a boil, then simmer covered 25 minutes until soft.|Add the greens: Stir in the spinach (thawed and squeezed dry) and cook 2 minutes.|Serve: Spoon over the rice."],
+'Black Bean Sweet Potato Bowl':[40,"@sweet|@beans|@spinach|Assemble: Put the sweet potato in a bowl, add the beans and spinach, and sprinkle the cheese on top while everything is hot so it melts."],
+'Chicken & Broccoli Rice':[50,"@rice|@chicken|@veg|Combine: Toss the broccoli with the chicken in the pan for 1 minute and spoon over the rice."],
+'Bean & Tomato Pasta':[25,"@pasta|@beans|Make the sauce: Add the tomatoes (with juice) to the beans and simmer 10 minutes over medium-low heat. Season with salt, pepper and Italian herbs if you have them.|Combine: Toss the sauce with the drained pasta."],
+'Lentil Tomato Pasta':[35,"@lentils|@pasta|Make the sauce: Return the lentils to their pot, add the tomatoes (with juice) and simmer 5 minutes. Season with salt and pepper.|Combine: Toss the sauce with the pasta."],
+'Rice, Beans & Egg':[50,"@rice|@beans|@fry|Serve: Put the rice in a bowl, add the beans and top with the fried eggs."],
+'Baked Salmon, Sweet Potato & Greens':[40,"Roast the sweet potato: Heat the oven to 400°F. Cube the sweet potato, toss with half the oil and a pinch of salt on a baking sheet, and roast 10 minutes.|@salmonbake|@spinach|Plate: Serve the salmon with the sweet potato and spinach."],
+'Turkey Quinoa Veggie Skillet':[35,"@quinoa|@turkey|@veg|Simmer: Add the vegetables and tomatoes (with juice) to the turkey pan and simmer 6 minutes.|Serve: Spoon over the quinoa."]});
+const R=[
+{s:'b',n:'PB Banana Oatmeal',i:{oats:1,banana:1,milk:1,pb:1},t:'Simmer oats in the milk for 3–4 minutes, then top with sliced banana and peanut butter.'},
+{s:'b',n:'Veggie Egg Scramble & Toast',i:{eggs:3,spin:1,bread:1,ched:.5},t:'Scramble eggs with spinach in a nonstick pan, finish with cheese and serve with toast.'},
+{s:'b',n:'Berry Yogurt Oat Bowl',i:{yog:1,oats:.5,berry:1},t:'Stir oats into yogurt, top with thawed berries and let sit 5 minutes to soften.'},
+{s:'b',n:'Egg & Bean Breakfast Burrito',i:{eggs:2,tort:1,bean:.5,ched:.5},t:'Scramble eggs, warm the beans, then roll everything with cheese in the tortilla.'},
+{s:'l',n:'Tuna Rice Bowl',i:{tuna:1,rice:1.5,broc:1,oil:.5},t:'Cook rice, steam broccoli, then flake tuna on top and drizzle with olive oil.'},
+{s:'l',n:'Chicken & Sweet Potato Plate',i:{chick:1.5,sweet:1,broc:1,oil:.5},t:'Roast cubed sweet potato at 425°F for 25 min; pan-sear the chicken in oil and steam the broccoli.'},
+{s:'l',n:'Lentil Veggie Stew',i:{lent:1.5,carrot:1,tom:1,onion:1,oil:.5},t:'Sauté onion in oil, add lentils, carrots, tomatoes and 2 cups water; simmer 25 min.'},
+{s:'l',n:'Turkey Burrito Bowl',i:{turk:1,bean:1,rice:1,tom:1},t:'Brown the turkey, then layer over cooked rice with beans and warmed tomatoes.'},
+{s:'d',n:'Chicken Veggie Pasta',i:{chick:1.5,pasta:1.5,mix:1,tom:1,oil:.5},t:'Boil pasta; sear sliced chicken in oil, add vegetables and tomatoes, then toss together.'},
+{s:'d',n:'Turkey Bean Chili',i:{turk:1.5,bean:1.5,tom:2,onion:1},t:'Brown turkey with onion, add beans and tomatoes, and simmer 20 min with chili powder.'},
+{s:'d',n:'Chicken Veggie Stir-Fry',i:{chick:1.5,rice:1.5,mix:1.5,oil:.5},t:'Stir-fry chicken strips in oil, add vegetables, and serve over cooked rice.'},
+{s:'d',n:'Lentil Spinach Rice Bowl',i:{lent:1,rice:1,spin:1,eggs:2,oil:.5},t:'Simmer lentils 20 min, wilt spinach in oil, serve over rice topped with fried eggs.'},
+{s:'s',n:'Yogurt & Banana',i:{yog:1,banana:1},t:'Slice the banana into the yogurt.'},
+{s:'s',n:'Apple & Peanut Butter',i:{apple:1,pb:1},t:'Slice the apple and dip in peanut butter.'},
+{s:'s',n:'Cottage Cheese & Berries',i:{cott:1,berry:.5},t:'Top cottage cheese with berries.'},
+{s:'s',n:'Protein Shake',i:{whey:1,milk:1,banana:.5},t:'Blend everything with ice until smooth.'},
+{s:'s',n:'Cheese & Apple',i:{ched:1,apple:1},t:'Slice the apple and enjoy with sliced cheddar.'},
+{s:'b',n:'Banana Oat Pancakes',i:{oats:1,eggs:2,banana:1},t:'Blend oats, eggs and banana, then cook small pancakes 2 min per side.'},
+{s:'b',n:'Cottage Cheese Toast & Apple',i:{cott:1,bread:1,apple:1},t:'Top toast with cottage cheese and serve with a sliced apple.'},
+{s:'b',n:'Sweet Potato Egg Hash',i:{sweet:1,eggs:2,onion:.5,oil:.5},t:'Pan-fry diced sweet potato and onion in oil until tender, then crack in the eggs and cook through.'},
+{s:'b',n:'Overnight Berry Oats',i:{oats:1,milk:1,berry:.5,yog:.5},t:'Mix everything in a jar the night before and refrigerate.'},
+{s:'l',n:'Chicken Burrito Bowl',i:{chick:1.5,rice:1,bean:.5,tom:1},t:'Sear sliced chicken, then serve over rice with beans and warmed tomatoes.'},
+{s:'l',n:'Tuna Pasta Salad',i:{tuna:1,pasta:1.5,carrot:1,oil:.5},t:'Toss cooked, cooled pasta with tuna, shredded carrot and olive oil.'},
+{s:'l',n:'Turkey Veggie Wrap',i:{turk:1,tort:2,mix:.5,ched:.5},t:'Brown the turkey, then wrap in tortillas with vegetables and cheese.'},
+{s:'l',n:'Egg Fried Rice',i:{eggs:2,rice:1.5,mix:1,oil:.5},t:'Scramble eggs in oil, add cooked rice and vegetables, and stir-fry 5 min.'},
+{s:'d',n:'Baked Chicken, Sweet Potato & Greens',i:{chick:1.5,sweet:1,spin:1,oil:.5},t:'Bake chicken and sweet potato at 425°F for 25 min; wilt spinach in oil.'},
+{s:'d',n:'Turkey Meat Sauce Spaghetti',i:{turk:1,pasta:1.5,tom:2,onion:.5},t:'Brown turkey with onion, add tomatoes and simmer 15 min, then serve over pasta.'},
+{s:'d',n:'Lentil Curry Bowl',i:{lent:1.5,rice:1,spin:1,tom:1,onion:.5},t:'Simmer lentils with onion, tomatoes and curry powder 25 min, then stir in spinach over rice.'},
+{s:'d',n:'Black Bean Sweet Potato Bowl',i:{bean:1.5,sweet:1,spin:1,ched:.5},t:'Roast sweet potato, warm the beans, then pile on spinach and cheese.'},
+{s:'d',n:'Chicken & Broccoli Rice',i:{chick:1.5,rice:1.5,broc:1.5,oil:.5},t:'Sear chicken in oil, steam broccoli, and serve over cooked rice.'},
+{s:'b',n:'Banana Oatmeal',i:{oats:1.5,banana:1},t:'Cook oats in water 3–4 minutes and top with sliced banana.'},
+{s:'b',n:'Egg & Toast',i:{eggs:2,bread:1},t:'Scramble or fry the eggs and serve with toast.'},
+{s:'l',n:'Rice & Beans',i:{rice:1.5,bean:1.5,tom:1},t:'Cook rice, then warm the beans with tomatoes and season with chili powder and salt.'},
+{s:'l',n:'Lentils & Rice',i:{lent:1,rice:1.5},t:'Simmer lentils 20 min and serve over rice with salt and pepper.'},
+{s:'l',n:'Simple Tuna Rice',i:{tuna:1,rice:1.5},t:'Flake tuna over hot rice and season with pepper.'},
+{s:'d',n:'Bean & Tomato Pasta',i:{pasta:2,bean:1.5,tom:1.5},t:'Boil pasta, simmer beans and tomatoes 10 min, then toss together.'},
+{s:'d',n:'Lentil Tomato Pasta',i:{lent:1,pasta:1.5,tom:1.5},t:'Simmer lentils until soft, add tomatoes, and toss with cooked pasta.'},
+{s:'d',n:'Rice, Beans & Egg',i:{rice:1.5,bean:1,eggs:2},t:'Serve warmed beans over rice and top with fried eggs.'},
+{s:'s',n:'Banana',i:{banana:1},t:'Eat a banana.'},
+{s:'s',n:'Toast & Peanut Butter',i:{bread:1,pb:1},t:'Spread peanut butter on toast.'},
+{s:'b',n:'Avocado Egg Toast',i:{eggs:3,bread:1,avocado:1},t:'Fry or poach the eggs, mash the avocado on toast, and stack together.'},
+{s:'b',n:'Almond Berry Yogurt Bowl',i:{yog:1.5,berry:.5,almond:.5,oats:.5},t:'Layer yogurt with berries, oats and chopped almonds.'},
+{s:'l',n:'Salmon Quinoa Bowl',i:{salmon:1.5,quinoa:1,broc:1,oil:.5},t:'Pan-sear salmon 4 min per side, steam broccoli, and serve over cooked quinoa.'},
+{s:'l',n:'Chicken Avocado Quinoa Bowl',i:{chick:2,quinoa:1,avocado:1,bean:.5},t:'Sear chicken, then serve over quinoa with sliced avocado and beans.'},
+{s:'d',n:'Baked Salmon, Sweet Potato & Greens',i:{salmon:1.5,sweet:1,spin:1,oil:.5},t:'Bake salmon and sweet potato at 400°F for 18–20 min and wilt spinach in oil.'},
+{s:'d',n:'Turkey Quinoa Veggie Skillet',i:{turk:1.5,quinoa:1,mix:1,tom:1},t:'Brown turkey, add vegetables and tomatoes, and serve over quinoa.'},
+{s:'s',n:'Apple & Almonds',i:{apple:1,almond:1},t:'Slice the apple and eat with almonds.'},
+{s:'s',n:'Cottage Cheese & Almonds',i:{cott:1,almond:.5},t:'Top cottage cheese with chopped almonds.'}];
+const G={lose:[-500,1],cut:[-750,1.1],maintain:[0,.8],lean:[250,1],bulk:[500,1]};
+const SL=[['b','Breakfast',.25],['l','Lunch',.3],['d','Dinner',.35],['s','Snack',.1]];
+const NOTE={ecto:'Ectomorph: fast metabolism, so your plan adds calories and leans on carbs. Prioritize heavy compound lifts and don’t skip meals.',meso:'Mesomorph: you respond well to both training and diet, so a balanced split of protein, carbs and fats works best.',endo:'Endomorph: you store energy easily, so your plan trims carbs a little, raises fats and favors high-fiber foods plus regular activity.'};
+const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),money=x=>'$'+x.toFixed(2),fmt=x=>+x.toFixed(2);
+let S={p:{sex:'m',age:30,ft:5,inch:9,wt:180,act:1.375,goal:'lose',arch:'auto'},bud:[10,10,10,10,10,10,10],day:0,tb:10,st:[1,1,1,1]};
+try{const x=JSON.parse(localStorage.getItem('bb1')||'null');if(x&&x.p&&x.bud&&x.bud.length===7)S=x}catch(e){}
+if(!S.meals||!S.meals.length)S.meals=['b','l','d'];
+if(!S.p.pp)S.p.pp=1;
+if(S.bev===undefined)S.bev='';if(S.pantry===undefined)S.pantry=false;if(!S.trip)S.trip=1;if(!S.tb)S.tb=((S.bud&&S.bud[0])||10)*S.trip;
+const save=()=>{try{localStorage.setItem('bb1',JSON.stringify(S))}catch(e){}};
+let PC={},LC={};
+function calc(){const p=S.p,wt=p.wt||150,kg=wt*.4536,cm=((p.ft||5)*12+(+p.inch||0))*2.54,bmi=kg/((cm/100)**2);
+const arch=p.arch==='auto'?(bmi<20.5?'ecto':bmi>26?'endo':'meso'):p.arch;
+const bmr=10*kg+6.25*cm-5*(p.age||30)+(p.sex==='m'?5:-161),tdee=bmr*p.act,g=G[p.goal],loss=g[0]<0;
+const adj=arch==='ecto'?(loss?100:200):arch==='endo'?(loss?-100:0):0;
+const cal=Math.max(p.sex==='m'?1500:1200,Math.round((tdee+g[0]+adj)/10)*10);
+const pro=Math.round(wt*g[1]),fat=Math.round(cal*(arch==='endo'?.35:.27)/9),carb=Math.max(0,Math.round((cal-pro*4-fat*9)/4));
+return{bmi,arch,tdee:Math.round(tdee),cal,pro,fat,carb}}
+function sum(q){let c=0,p=0,cb=0,f=0,m=0;for(const k in q){const x=I[k],n=q[k];c+=x[2]*n;p+=x[3]*n;cb+=x[4]*n;f+=x[5]*n;m+=PC[k].p/PK[k][0]*n}return{c,p,cb,f,m}}
+function mk(r,tc){const b=(S.bev==='wine'&&r.s!==(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?'':(BEV[S.bev]||''),bc=b?I[b][2]:0,f=clamp((tc-bc)/sum(r.i).c,.5,2.4),q={};for(const k in r.i)q[k]=Math.max(.25,Math.round(r.i[k]*f*4)/4);if(b)q[b]=(q[b]||0)+1;return{r,q,...sum(q)}}
+const TODAY=0;
+function dateFor(i){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+i-TODAY);return d}
+function build(t,bud,day,stock,avoid){let r;for(const f of [1,.9,.8,.7,.6]){r=build1({...t,cal:t.cal*f,pro:t.pro*f},bud,day,stock,avoid);r.trim=f;if(!r.over)return r}return r}
+function build1(t,bud,day,stock,avoid){stock=stock||{};const sel=SL.filter(x=>S.meals.includes(x[0])),tw=sel.reduce((a,x)=>a+x[2],0),n=sel.length,sb=bud/n,seed=Math.floor(dateFor(day).getTime()/864e5),N=NP();
+const ck=t.cal+'|'+S.meals+'|'+S.bev+'|'+NP();const cs=LC[ck]||(LC[ck]=(()=>{const lists=sel.map(([s,,sh])=>R.filter(r=>r.s===s).map(r=>mk(r,t.cal*sh/tw)));let cs=[[]];lists.forEach(L=>{const nx=[];cs.forEach(c=>L.forEach(x=>nx.push(c.concat([x]))));cs=nx});return cs})());
+const res=cs.map(c=>{const agg={};c.forEach(x=>{for(const k in x.q)agg[k]=(agg[k]||0)+x.q[k]*N});
+const pk={},packs={};let cost=0,uv=0;for(const k in agg){const need=Math.max(0,agg[k]-(stock[k]||0));packs[k]=Math.ceil(need/PK[k][0]-1e-9);pk[k]=packs[k]*PC[k].p;cost+=pk[k];uv+=Math.min(stock[k]||0,agg[k])*PC[k].p/PK[k][0]}
+const share=c.map(x=>{let s=0;for(const k in x.q)s+=x.q[k]*N/agg[k]*pk[k];return s});
+const p=c.reduce((a,x)=>a+x.p,0),cal=c.reduce((a,x)=>a+x.c,0);
+const fat=c.reduce((a,x)=>a+x.f,0),pr=p>t.pro?-Math.min(p-t.pro,t.pro*.3)*.7:t.pro-p;
+return{c,agg,packs,share,cost,ok:share.every(s=>s<=sb+1e-9),sc:pr+Math.abs(cal-t.cal)/15+(bud-cost-uv)*3-uv*1.5+c.filter(x=>avoid&&avoid.has(x.r.n)).length*40+Math.max(0,fat*9/cal-.38)*150}});
+const good=res.filter(r=>r.ok).sort((a,b)=>a.sc-b.sc),over=!good.length;
+const r=over?res.sort((a,b)=>a.cost-b.cost)[0]:good[seed%Math.min(5,good.length)];
+const m=r.c.map((x,i)=>({...x,m:r.share[i],slot:sel[i][1],sb}));
+const tot={c:0,p:0,cb:0,f:0,m:r.cost};m.forEach(x=>{tot.c+=x.c;tot.p+=x.p;tot.cb+=x.cb;tot.f+=x.f});
+const ns={},used={};for(const k in r.agg){const have=stock[k]||0;used[k]=Math.min(have,r.agg[k]);ns[k]=have+r.packs[k]*PK[k][0]-r.agg[k]}for(const k in stock)if(!(k in ns))ns[k]=stock[k];for(const k in ns)if(ns[k]<1e-6)delete ns[k];
+return{pick:{m,tot},over,agg:r.agg,packs:r.packs,stock:ns,used}}
+const bar=(l,v,t,u)=>`<div class="meta">${l}: <b>${Math.round(v)}</b> / ${t} ${u}</div><div class="bar"><i style="width:${clamp(v/t*100,0,100)}%"></i></div>`;
+function render(){
+if(!S.st.some(x=>x)){S.st=[1,0,0,0];ST.forEach((s,i)=>$('st'+i).checked=!!S.st[i])}
+PC={};LC={};for(const k in I){const a=S.st.map((on,i)=>on?pkP(k,i):Infinity),m=Math.min(...a);PC[k]={p:m,s:a.indexOf(m)}}
+const t=calc(),L=S.trip||1;let stock={};const RS=[];
+let anyShort=false;for(let i0=0;i0<7;){const real=true,maxLen=Math.min(L,7-i0),stIn=stock;let len,B,days,st,spent,pk,ag,ov,rs,done=false;
+for(len=maxLen;len>=1&&!done;len--){B=S.tb;days=[...Array(len).keys()].map(j=>i0+j);
+for(const pace of len===1?[1]:[1.8,1.2]){const avoid=new Set();st=stIn;spent=0;pk={};ag={};ov=false;
+rs=[];for(let j=0;j<len;j++){const i=days[j],left=len-j,rem=B-spent,cap=left===1?rem:Math.min(rem,rem/left*pace),r=build(t,Math.max(cap,1),i,st,avoid);st=r.stock;spent+=r.pick.tot.m;ov=ov||r.over;r.pick.m.forEach(x=>avoid.add(x.r.n));for(const k in r.packs)pk[k]=(pk[k]||0)+r.packs[k];for(const k in r.agg)ag[k]=(ag[k]||0)+r.agg[k];rs.push(r);if(r.over||spent>B+.005)break}
+if(!ov&&spent<=B+.005){done=true;break}}}
+len=days.length;anyShort=anyShort||len<maxLen;
+const used={};for(const k in ag){const u=Math.min(stIn[k]||0,ag[k]);if(u>.01)used[k]=u}
+const N0=NP(),pc={};for(const k in pk)pc[k]=pk[k]*PC[k].p;rs.forEach(r=>{r.dayCost=0;r.pick.m.forEach(x=>{let s=0;for(const k in x.q)if(ag[k])s+=x.q[k]*N0/ag[k]*(pc[k]||0);x.m=s;r.dayCost+=s})});
+const tr={start:i0,len,B,short:len<maxLen,cost:spent,packs:pk,agg:ag,used,over:ov||spent>B+.005,end:st};
+rs.forEach((r,j)=>{r.trip=tr;r.first=j===0;r.idx=days[j];RS.push(r)});
+if(real&&S.pantry)stock=st;i0+=len}
+const R2=RS[S.day],{pick,trim}=R2,over=R2.trip.over,T=pick.tot;Object.assign(R2,{packs:R2.trip.packs,agg:R2.trip.agg,used:R2.trip.used,stock:R2.trip.end});
+const week=RS.map((r,i)=>({d:DY[i],i,b:S.tb,m:r.pick.tot.m,c:r.pick.tot.c,first:r.first,tc:r.trip.cost,tB:r.trip.B,over:r.trip.over&&r.first}));
+const agg=R2.agg,pks=k=>R2.packs[k]||0;
+const by={};for(const k in agg){const pr=PC[k];if(pks(k))(by[pr.s]=by[pr.s]||[]).push([k,pks(k),pr.p*pks(k)])}
+const cmp=ST.map((s,i)=>S.st[i]?[s,Object.keys(agg).reduce((a,k)=>a+pks(k)*pkP(k,i),0)]:null).filter(Boolean);
+const minC=Math.min(...cmp.map(x=>x[1]));
+let h=`<div class="card pg" data-p="plan"><h2>Your plan</h2><div class="grid">
+<div class="stat"><b>${t.cal}</b><span>daily kcal target</span></div>
+<div class="stat"><b>${t.pro} g</b><span>protein</span></div>
+<div class="stat"><b>${t.carb} g</b><span>carbs</span></div>
+<div class="stat"><b>${t.fat} g</b><span>fat</span></div></div>
+<p class="meta" style="margin:8px 0 0">BMI ${t.bmi.toFixed(1)} · maintenance ≈ ${t.tdee} kcal · archetype: ${{ecto:'Ectomorph',meso:'Mesomorph',endo:'Endomorph'}[t.arch]}<br>${NOTE[t.arch]}</p></div>
+<div class="card pg" data-p="plan meals shop"><h2>Pick a day &amp; budget</h2><div class="chips">${week.map(w=>`<button class="chip ${w.i===S.day?'on':''}" onclick="pickDay(${w.i})">${w.d} ${dateFor(w.i).getDate()}<small>${w.first?'🛒 '+money(w.tc):'leftovers'}</small></button>`).join('')}</div>
+<div class="row" style="margin-top:8px"><label>Budget per shopping trip ($) · covers ${L===1?'1 day':L+' days'}<input id="bud" type="number" min="1" step="1" value="${S.tb}" style="width:110px"></label></div></div>
+<div class="card pg" data-p="plan"><h2>${DY[S.day]}: ${money(R2.trip.cost)} at the register (${R2.trip.len>1?DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' trip, ':''}budget ${money(R2.trip.B)})</h2>${R2.trip.short?`<p class="warn">Your ${money(R2.trip.B)} budget covers ${R2.trip.len} of ${Math.min(S.trip||1,7-R2.trip.start)} days, so shop again on ${DY[R2.trip.start+R2.trip.len]||'the next trip day'} for the rest.</p>`:''}${trim<1&&!over?`<p class="warn">Recipes were scaled to about ${Math.round(trim*100)}% of your calorie target (${Math.round(t.cal*trim)} kcal) to fit this budget.</p>`:''}
+${over?`<p class="warn">Even at 60% of your calories, this budget can’t cover whole packages at the register. The cheapest plan is ${money(R2.trip.cost)}, so raise the budget or plan fewer meals.</p>`:''}
+${bar('Calories',T.c,t.cal,'kcal')}${bar('Protein',T.p,t.pro,'g')}${bar('Carbs',T.cb,t.carb,'g')}${bar('Fat',T.f,t.fat,'g')}${bar('Spend',R2.trip.cost,R2.trip.B,'$')}</div><div class="card pg" data-p="plan"><h2>Budget breakdown</h2><table>${RS.filter(r=>r.trip===R2.trip).map(r=>`<tr><td>${DY[r.idx]}</td><td>${r.pick.m.map(x=>x.r.n).join(', ')}</td><td>${money(r.dayCost)}</td></tr>`).join('')}<tr><td colspan="2"><b>Trip total at the register</b></td><td><b>${money(R2.trip.cost)}</b></td></tr><tr><td colspan="2">Budget</td><td>${money(R2.trip.B)}</td></tr><tr><td colspan="2">${R2.trip.B>=R2.trip.cost?'Left in budget':'Over budget'}</td><td class="${R2.trip.B>=R2.trip.cost?'best':'warn'}">${money(Math.abs(R2.trip.B-R2.trip.cost))}</td></tr></table><p class="note">Each day shows its share of the packages you buy for the trip.</p></div>`;
+pick.m.forEach((x,i)=>{h+=`<div class="card meal pg" data-p="meals"><span class="tag">${x.slot}</span><h3><span>${x.r.n}</span><span class="meta">${Math.round(x.c)} kcal · ${Math.round(x.p)}g P · ${Math.round(x.cb)}g C · ${Math.round(x.f)}g F · ${money(x.m)}</span></h3>
+<ul>${Object.keys(x.q).map(k=>`<li>${fmt(x.q[k]*I[k][0]*NP())} ${I[k][1]}</li>`).join('')}</ul>${S.bev&&(S.bev!=='wine'||x.r.s===(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?`<div class="meta">🥤 ${S.bev==='water'?'Drink: water. ':''}${BSUG[S.bev]}</div>`:''}${STEPS[x.r.n]?`${stepsHTML(x.r.n)}`:`<div class="meta">${x.r.t}</div>`}</div>`});
+h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0);return`<table><tr><th colspan="2">${ST[s]}</th></tr>${L.map(([k,q,c])=>`<tr><td>${q} × ${PK[k][1]}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table><div style="height:8px"></div>`}).join('')}
+${Object.keys(agg).some(k=>(R2.used[k]||0)>.01)?`<table><tr><th colspan="2">From your pantry</th></tr>${Object.keys(agg).filter(k=>(R2.used[k]||0)>.01).map(k=>`<tr><td>${fmt(R2.used[k]*I[k][0])} ${I[k][1]}</td><td>$0.00</td></tr>`).join('')}</table><div style="height:8px"></div>`:''}<h2 style="margin-top:6px">Store comparison</h2><table>${cmp.map(([s,c])=>`<tr><td class="${c===minC?'best':''}">${s} only${c===minC?' (cheapest single store)':''}</td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Mixing stores (best price each)</b></td><td><b>${money(R2.trip.cost)}</b></td></tr></table></div>
+<div class="card pg" data-p="week"><h2>Next 7 days</h2><table><tr><th>Day</th><th>kcal</th><th>Cost / budget</th></tr>${week.map(w=>`<tr onclick="pickDay(${w.i})" style="cursor:pointer"><td>${w.d}</td><td>${Math.round(w.c)}</td><td class="${w.over?'warn':''}">${w.first?money(w.tc)+' / '+money(w.tB)+(w.tB!==w.b?' trip':''):'from leftovers'}</td></tr>`).join('')}</table></div>`;
+$('plan').innerHTML=h;show();const b=$('bud');b.onchange=()=>{S.tb=Math.max(1,+b.value||10);save();render()}}
+function pickDay(i){triggerHaptic('light');S.day=i;save();render()}
+function allDays(){S.bud=S.bud.map(()=>S.bud[S.day]);save();render()}
+['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);e.value=S.p[id];e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?+e.value:e.value;save();render()}});
+$('stores').innerHTML=ST.map((s,i)=>`<label class="ck"><input type="checkbox" id="st${i}"> ${s}</label>`).join('');
+ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!S.st[i];e.onchange=()=>{S.st[i]=e.checked?1:0;save();render()}});
+$('meals').innerHTML=SL.map(([s,n])=>`<label class="ck"><input type="checkbox" id="ml${s}"> ${n}</label>`).join('');
+SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));if(!a.length){e.checked=true;return}S.meals=a;save();render()}});
+const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bev').value;bn();save();render()};
+$('trip').value=S.trip;$('trip').onchange=()=>{const o=S.trip||1;S.trip=+$('trip').value;S.tb=Math.round(S.tb/o*S.trip);save();render()};
+$('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{S.pantry=$('pantry').checked;save();render()};
+let PAGE=(location.hash||'').slice(1);if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE='plan';
+function show(){document.querySelectorAll('.pg').forEach(e=>{e.style.display=e.dataset.p.split(' ').includes(PAGE)?'':'none'});document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===PAGE))}
+function go(p){triggerHaptic('selection');PAGE=p;try{location.hash=p}catch(e){}show();window.scrollTo(0,0)}
+render();
+</script></body></html>
