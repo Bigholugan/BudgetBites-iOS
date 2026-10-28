@@ -1,6 +1,6 @@
 # BudgetBites for iOS 🥗
 
-A complete native iOS wrapper and offline application for **BudgetBites – Daily Meal Planner**, built with Swift, SwiftUI, and WebKit.
+A complete native iOS application for **BudgetBites – Daily Meal Planner**, built with Swift, SwiftUI, WebKit, and configured for **`xtool`** (`xtool-org/xtool`) and **Swift Package Manager**.
 
 ---
 
@@ -8,84 +8,88 @@ A complete native iOS wrapper and offline application for **BudgetBites – Dail
 
 ```
 BudgetBites-iOS/
-├── BudgetBites.xcodeproj/       # Xcode project file (open in Xcode 14+)
-├── BudgetBites/
-│   ├── App/
-│   │   └── BudgetBitesApp.swift       # Native SwiftUI entry point
-│   ├── Views/
-│   │   └── WebViewContainer.swift     # WKWebView wrapper with haptics & offline storage
-│   ├── Resources/
-│   │   ├── Assets.xcassets/           # 1024x1024 AppIcon and image catalogs
-│   │   └── Info.plist                 # iOS permissions, status bar & orientation settings
-│   └── www/                           # Bundled offline web application
-│       ├── index.html                 # Complete meal planner with safe area & haptic support
-│       ├── manifest.json              # Web App manifest for PWA installation
-│       └── icon-512.png               # High-resolution app icon
+├── Package.swift               # SwiftPM manifest (configured for xtool)
+├── xtool.yml                   # xtool configuration manifest (bundle ID, resources)
+├── Sources/
+│   └── BudgetBites/
+│       ├── BudgetBitesApp.swift       # Native SwiftUI entry point
+│       ├── Views/
+│       │   └── WebViewContainer.swift # WKWebView wrapper with haptics & offline storage
+│       └── Resources/
+│           ├── Info.plist             # iOS permissions, status bar & orientation
+│           ├── Assets.xcassets/       # 1024x1024 AppIcon and image catalogs
+│           └── www/                   # Bundled offline web application
+│               ├── index.html         # Complete meal planner with safe area & haptic support
+│               ├── manifest.json      # Web App manifest for PWA installation
+│               └── icon-512.png       # High-resolution app icon
+├── BudgetBites.xcodeproj/       # Xcode project file (compatible with Xcode 14+)
 ├── .github/workflows/
-│   └── build-and-sign.yml             # Cloud CI/CD to build & sign .ipa on GitHub's macOS runners
-├── ExportOptions.plist                # Archive export configuration
+│   └── build-and-sign.yml             # GitHub Actions CI/CD to build & sign with xtool
+├── ExportOptions.plist
 └── README.md
 ```
 
 ---
 
-## 🚀 How to Build and Sign
+## 🛠️ Building with `xtool`
 
-Because iOS requires Apple Developer cryptographic signatures and the Apple SDK (which runs on macOS), here are the four ways to build, sign, and install this app:
+### What is `xtool`?
+[`xtool`](https://github.com/xtool-org/xtool) is an open-source, cross-platform CLI tool that builds, signs, and deploys iOS apps directly from standard Swift Package Manager projects without requiring manual `.xcodeproj` maintenance.
 
-### Method 1: Using Xcode on a Mac (Recommended if you have a Mac)
-1. Transfer this folder to your Mac.
-2. Open `BudgetBites.xcodeproj` in Xcode.
-3. Select the **BudgetBites** target in the left navigator.
-4. Under the **Signing & Capabilities** tab:
-   - Check **"Automatically manage signing"**.
-   - Under **Team**, select your Apple ID (Free Personal Team or Paid Apple Developer Account).
-   - If prompted, change the Bundle Identifier from `com.budgetbites.app` to something unique (e.g. `com.yourname.budgetbites`).
-5. Connect your iPhone via USB, select your device in the top bar, and press **Run (Cmd + R)**.
-6. On your iPhone: Go to **Settings > General > VPN & Device Management**, tap your Apple ID, and tap **Trust**.
+### Local Development with `xtool` (macOS or Linux/WSL)
+1. Install `xtool`:
+   ```bash
+   brew tap xtool-org/tap
+   brew install xtool
+   ```
+2. Setup Darwin SDK:
+   ```bash
+   xtool setup
+   ```
+3. Authenticate with Apple Developer (for automatic signing):
+   ```bash
+   xtool auth login --username "YOUR_APPLE_ID"
+   ```
+4. Build and run:
+   ```bash
+   # Run on connected iPhone via USB
+   xtool dev
+
+   # Run on iOS Simulator (macOS only)
+   xtool dev --simulator
+
+   # Build only
+   xtool dev build --configuration release
+   ```
 
 ---
 
-### Method 2: Free Automated Cloud Build via GitHub Actions (No Mac Required)
-This project includes a pre-configured GitHub Actions workflow in `.github/workflows/build-and-sign.yml` that builds on Apple Silicon macOS runners in the cloud:
+## ☁️ Automated Cloud Build & Signing via GitHub Actions (No Mac Needed)
 
-1. Push this folder to a GitHub repository (Public or Private):
+This repository includes a ready-to-run GitHub Actions workflow in `.github/workflows/build-and-sign.yml` that uses `xtool` on macOS runners:
+
+1. Create a repository on GitHub and push this project:
    ```bash
-   git init
-   git add .
-   git commit -m "Initial commit of BudgetBites iOS"
+   cd BudgetBites-iOS
+   git remote add origin https://github.com/YOUR_USERNAME/BudgetBites-iOS.git
    git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/budgetbites-ios.git
    git push -u origin main
    ```
-2. **If you have Apple Developer Signing Credentials**, add these in GitHub repository **Settings > Secrets and variables > Actions**:
-   - `BUILD_CERTIFICATE_BASE64`: Base64 string of your `.p12` distribution certificate
-   - `P12_PASSWORD`: Password for your `.p12` file
-   - `BUILD_PROVISION_PROFILE_BASE64`: Base64 string of your `.mobileprovision` file
-   - `KEYCHAIN_PASSWORD`: Any temporary password string (e.g. `secret123`)
-3. Go to the **Actions** tab in your GitHub repository and trigger the **Build & Export iOS App** workflow.
-4. Download the generated **`BudgetBites.ipa`** from the Workflow Artifacts.
-*(Note: If you don't add secrets, it will produce an unsigned `.ipa` that can be signed with Sideloadly or AltStore).*
+2. **(Optional) Add Apple Signing Secrets** in GitHub repository **Settings > Secrets and variables > Actions**:
+   - `APPLE_ID` & `APPLE_PASSWORD` (for xtool auto-authentication)
+   - OR `BUILD_CERTIFICATE_BASE64` & `P12_PASSWORD` & `BUILD_PROVISION_PROFILE_BASE64` (for enterprise/distribution signing)
+3. Go to the **Actions** tab in GitHub and run **Build and Sign iOS App with xtool**.
+4. Download the generated **`BudgetBites.ipa`** from the artifacts section!
 
 ---
 
-### Method 3: Sideload onto iPhone on Windows (Using Sideloadly or AltStore)
-If you build an unsigned `.ipa` or want to install directly from your Windows PC using your standard Apple ID:
-1. Download [Sideloadly](https://sideloadly.io/) or [AltStore](https://altstore.io/) for Windows.
-2. Connect your iPhone to your PC via USB.
-3. Drag the `BudgetBites.ipa` into Sideloadly.
-4. Enter your Apple ID and click **Start**. It will automatically sign the app with your free personal Apple ID and install it directly to your device!
+## 📲 Installing on Your iPhone
 
----
-
-### Method 4: Instant Safari Web Clip / PWA (Zero compile, 10 seconds)
-You can also run this directly on any iPhone right now without any compilation or signing:
-1. In this project directory, run a local web server:
-   ```bash
-   cd BudgetBites/www
-   python -m http.server 8080
-   ```
-2. Open Safari on your iPhone, navigate to `http://<YOUR_PC_LOCAL_IP>:8080`.
-3. Tap the **Share** button (box with upward arrow) at the bottom of Safari.
-4. Scroll down and tap **"Add to Home Screen"**.
-5. It will install with the custom BudgetBites app icon and run full-screen without browser bars, supporting offline storage and the complete meal planning suite.
+1. **Via Sideloadly / AltStore (Windows / Mac)**:
+   - Connect iPhone via USB.
+   - Drag `BudgetBites.ipa` into Sideloadly, enter your Apple ID, and click Start.
+2. **Via Xcode (Mac)**:
+   - Open `BudgetBites.xcodeproj`, select your team, and press Run (Cmd+R).
+3. **Instant Safari Web Clip (Zero compile, right now)**:
+   - Run `python -m http.server 8080` inside `Sources/BudgetBites/Resources/www`.
+   - Open `http://<YOUR_PC_IP>:8080` in Safari on your iPhone, tap Share -> "Add to Home Screen".

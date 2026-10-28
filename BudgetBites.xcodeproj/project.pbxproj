@@ -17,11 +17,11 @@
 /* Begin PBXFileReference section */
 		AA0000032CE8000100000001 /* BudgetBites.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BudgetBites.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000022CE8000100000001 /* BudgetBitesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetBitesApp.swift; sourceTree = "<group>"; };
-		AA0000022CE8000100000002 /* WebViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainer.swift; sourceTree = "<group>"; };
-		AA0000022CE8000100000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA0000022CE8000100000004 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = "<group>"; };
+		AA0000022CE8000100000002 /* WebViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WebViewContainer.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		AA0000022CE8000100000004 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/www; sourceTree = "<group>"; };
 		AA0000022CE8000100000005 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		AA0000022CE8000100000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000022CE8000100000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Resources/Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,21 +39,22 @@
 		AA0000052CE8000100000001 = {
 			isa = PBXGroup;
 			children = (
-				AA0000052CE8000100000002 /* BudgetBites */,
+				AA0000052CE8000100000002 /* Sources */,
 				AA0000052CE8000100000003 /* Frameworks */,
 				AA0000052CE8000100000004 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		AA0000052CE8000100000002 /* BudgetBites */ = {
+		AA0000052CE8000100000002 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				AA0000052CE8000100000005 /* App */,
-				AA0000052CE8000100000006 /* Views */,
-				AA0000052CE8000100000007 /* Resources */,
+				AA0000022CE8000100000001 /* BudgetBitesApp.swift */,
+				AA0000022CE8000100000002 /* WebViewContainer.swift */,
+				AA0000022CE8000100000003 /* Assets.xcassets */,
 				AA0000022CE8000100000004 /* www */,
+				AA0000022CE8000100000006 /* Info.plist */,
 			);
-			path = BudgetBites;
+			path = Sources/BudgetBites;
 			sourceTree = "<group>";
 		};
 		AA0000052CE8000100000003 /* Frameworks */ = {
@@ -70,31 +71,6 @@
 				AA0000032CE8000100000001 /* BudgetBites.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AA0000052CE8000100000005 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000022CE8000100000001 /* BudgetBitesApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		AA0000052CE8000100000006 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000022CE8000100000002 /* WebViewContainer.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		AA0000052CE8000100000007 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000022CE8000100000003 /* Assets.xcassets */,
-				AA0000022CE8000100000006 /* Info.plist */,
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,7 +274,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BudgetBites/Resources/Info.plist;
+				INFOPLIST_FILE = Sources/BudgetBites/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BudgetBites;
 				INFOPLIST_KEY_LSRequiresIPhoneOS = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -328,7 +304,7 @@
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = BudgetBites/Resources/Info.plist;
+				INFOPLIST_FILE = Sources/BudgetBites/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BudgetBites;
 				INFOPLIST_KEY_LSRequiresIPhoneOS = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

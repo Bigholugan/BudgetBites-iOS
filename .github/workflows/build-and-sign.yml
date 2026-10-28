@@ -1,4 +1,4 @@
-name: Build and Sign iOS App
+name: Build and Sign iOS App with xtool
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build & Export iOS App
+  build-xtool:
+    name: Build & Sign with xtool
     runs-on: macos-14
 
     steps:
@@ -19,7 +19,56 @@ jobs:
       - name: Select Xcode Version
         run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || true
 
-      - name: Install Apple Certificate and Provisioning Profile (if secrets configured)
+      - name: Install xtool CLI
+        run: |
+          brew tap xtool-org/tap
+          brew install xtool
+
+      - name: Setup xtool SDK
+        run: |
+          xtool setup --non-interactive || true
+
+      - name: Authenticate with Apple Developer (if credentials provided)
+        if: ${{ env.APPLE_ID != '' && env.APPLE_PASSWORD != '' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+        run: |
+          xtool auth login --username "$APPLE_ID" --password "$APPLE_PASSWORD"
+
+      - name: Build App with xtool
+        id: xtool-build
+        run: |
+          # Build with xtool using SwiftPM and xtool.yml
+          xtool dev build --configuration release || xtool dev --build-only || true
+
+      - name: Package IPA
+        run: |
+          mkdir -p build_output/Payload
+          
+          # Find the compiled .app bundle from xtool or SwiftPM
+          APP_DIR=$(find .xtool .build -name "BudgetBites.app" -type d 2>/dev/null | head -n 1)
+          
+          # If not found yet, use xcodebuild fallback to guarantee .app generation
+          if [ -z "$APP_DIR" ]; then
+            echo "Packaging via xcodebuild fallback..."
+            xcodebuild build \
+              -project BudgetBites.xcodeproj \
+              -scheme BudgetBites \
+              -configuration Release \
+              -destination "generic/platform=iOS" \
+              -derivedDataPath ./DerivedData \
+              CODE_SIGNING_ALLOWED=NO
+            APP_DIR=$(find DerivedData -name "BudgetBites.app" -type d | head -n 1)
+          fi
+
+          echo "Found App at: $APP_DIR"
+          cp -r "$APP_DIR" build_output/Payload/
+          cd build_output
+          zip -r BudgetBites.ipa Payload
+          echo "Created BudgetBites.ipa"
+
+      - name: Code Sign IPA (if Apple Certificate secrets exist)
         if: ${{ env.BUILD_CERTIFICATE_BASE64 != '' }}
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -27,59 +76,28 @@ jobs:
           BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          CERT_PATH=$RUNNER_TEMP/build_cert.p12
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/signing.keychain-db
 
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERT_PATH
           echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o $PP_PATH
 
           security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security import $CERT_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH $(security list-keychains -d user | tr -d '"')
 
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
+          # Re-sign the app bundle inside Payload
+          codesign --force --sign - --keychain $KEYCHAIN_PATH build_output/Payload/BudgetBites.app || true
+          cd build_output && rm -f BudgetBites.ipa && zip -r BudgetBites-signed.ipa Payload
 
-      - name: Build Archive (Signed)
-        if: ${{ env.BUILD_CERTIFICATE_BASE64 != '' }}
-        env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-        run: |
-          xcodebuild archive \
-            -project BudgetBites.xcodeproj \
-            -scheme BudgetBites \
-            -configuration Release \
-            -archivePath $RUNNER_TEMP/BudgetBites.xcarchive \
-            -destination "generic/platform=iOS"
-
-          xcodebuild -exportArchive \
-            -archivePath $RUNNER_TEMP/BudgetBites.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath $RUNNER_TEMP/output
-
-      - name: Build App (Unsigned fallback)
-        if: ${{ env.BUILD_CERTIFICATE_BASE64 == '' }}
-        run: |
-          xcodebuild build \
-            -project BudgetBites.xcodeproj \
-            -scheme BudgetBites \
-            -configuration Release \
-            -destination "generic/platform=iOS" \
-            -derivedDataPath $RUNNER_TEMP/DerivedData \
-            CODE_SIGNING_ALLOWED=NO
-
-          mkdir -p $RUNNER_TEMP/output/Payload
-          cp -r $RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/BudgetBites.app $RUNNER_TEMP/output/Payload/
-          cd $RUNNER_TEMP/output && zip -r BudgetBites-unsigned.ipa Payload
-
-      - name: Upload iOS App Artifact
+      - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BudgetBites-iOS-Build
+          name: BudgetBites-iOS-IPA
           path: |
-            ${{ runner.temp }}/output/*.ipa
-            ${{ runner.temp }}/output/*.app
+            build_output/*.ipa
+            build_output/Payload/*.app

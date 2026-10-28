@@ -10,7 +10,7 @@ struct WebViewContainer: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         let contentController = WKUserContentController()
 
-        // Register haptic message handler
+        // Register native haptic feedback handler
         contentController.add(context.coordinator, name: "haptic")
         configuration.userContentController = contentController
 
@@ -24,13 +24,24 @@ struct WebViewContainer: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = UIColor(red: 246/255, green: 247/255, blue: 242/255, alpha: 1.0)
 
-        // Load local index.html bundled in app
-        if let wwwURL = Bundle.main.url(forResource: "www", withExtension: nil),
-           let indexURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") {
-            webView.loadFileURL(indexURL, allowingReadAccessTo: wwwURL)
-        } else if let indexURL = Bundle.main.url(forResource: "index", withExtension: "html") {
-            let bundleURL = Bundle.main.bundleURL
-            webView.loadFileURL(indexURL, allowingReadAccessTo: bundleURL)
+        // Locate bundled index.html across SwiftPM (xtool) and Xcode bundles
+        var targetURL: URL?
+
+        #if SWIFT_PACKAGE
+        targetURL = Bundle.module.url(forResource: "index", withExtension: "html", subdirectory: "www") ??
+                    Bundle.module.url(forResource: "index", withExtension: "html", subdirectory: "Resources/www") ??
+                    Bundle.module.url(forResource: "index", withExtension: "html")
+        #endif
+
+        if targetURL == nil {
+            targetURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "www") ??
+                        Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Resources/www") ??
+                        Bundle.main.url(forResource: "index", withExtension: "html")
+        }
+
+        if let indexURL = targetURL {
+            let directoryURL = indexURL.deletingLastPathComponent()
+            webView.loadFileURL(indexURL, allowingReadAccessTo: directoryURL)
         }
 
         return webView

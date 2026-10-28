@@ -1,0 +1,6 @@
+version: 1
+bundleID: com.budgetbites.app
+product: BudgetBites
+infoPath: Sources/BudgetBites/Resources/Info.plist
+resources:
+  - Sources/BudgetBites/Resources/www
