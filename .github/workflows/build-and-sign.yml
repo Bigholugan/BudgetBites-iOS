@@ -16,13 +16,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || true
+      - name: Verify Xcode Environment
+        run: |
+          echo "Current Developer Dir: $(xcode-select -p)"
+          xcodebuild -version
 
       - name: Install xtool CLI
         run: |
-          brew tap xtool-org/tap
-          brew install xtool
+          echo "Downloading latest xtool release binary..."
+          curl -fL "https://github.com/xtool-org/xtool/releases/latest/download/xtool.app.zip" -o /tmp/xtool.app.zip
+          unzip -q /tmp/xtool.app.zip -d /tmp
+          sudo cp /tmp/xtool.app/Contents/MacOS/xtool /usr/local/bin/xtool
+          sudo chmod +x /usr/local/bin/xtool
+          xtool --version || true
 
       - name: Setup xtool SDK
         run: |
