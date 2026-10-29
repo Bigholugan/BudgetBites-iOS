@@ -51,14 +51,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 4px;b
 
 <div class="card pg" data-p="profile"><h2>Your profile</h2>
 <div class="grid">
-<label>Sex<select id="sex"><option value="m">Male</option><option value="f">Female</option></select></label>
-<label>Age<input id="age" type="number" min="14" max="90"></label>
-<label>Height (ft)<input id="ft" type="number" min="3" max="7"></label>
-<label>Height (in)<input id="inch" type="number" min="0" max="11"></label>
-<label>Weight (lb)<input id="wt" type="number" min="80" max="500"></label>
-<label>Portions cooked<input id="pp" type="number" min="1" max="8"></label>
-<label>Activity<select id="act"><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
-<label>Goal<select id="goal"><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
+<label>Sex<select id="sex"><option value="" disabled selected>Select sex</option><option value="m">Male</option><option value="f">Female</option></select></label>
+<label>Age<input id="age" type="number" min="14" max="90" placeholder="e.g. 28"></label>
+<label>Height (ft)<input id="ft" type="number" min="3" max="7" placeholder="e.g. 5"></label>
+<label>Height (in)<input id="inch" type="number" min="0" max="11" placeholder="e.g. 9"></label>
+<label>Weight (lb)<input id="wt" type="number" min="80" max="500" placeholder="e.g. 165"></label>
+<label>Portions cooked<input id="pp" type="number" min="1" max="8" placeholder="1"></label>
+<label>Activity<select id="act"><option value="" disabled selected>Select activity</option><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
+<label>Goal<select id="goal"><option value="" disabled selected>Select goal</option><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
 <label>Body archetype<select id="arch"><option value="auto">Auto (from BMI)</option><option value="ecto">Ectomorph (lean, hard gainer)</option><option value="meso">Mesomorph (athletic)</option><option value="endo">Endomorph (gains easily)</option></select></label>
 </div>
 <div class="row" style="margin-top:10px"><span class="meta">Meals to plan (budget splits evenly):</span><span id="meals" class="row"></span></div>
@@ -66,6 +66,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 4px;b
 <div class="row" style="margin-top:10px"><label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label></div>
 <div class="row" style="margin-top:10px"><label>Beverage with meals<select id="bev"><option value="">None</option><option value="water">Water</option><option value="tea">Unsweetened tea</option><option value="coffee">Black coffee</option><option value="milk">Milk (2%)</option><option value="sparkling">Sparkling water</option><option value="soda">Healthy soda (low sugar)</option><option value="wine">Wine (21+)</option></select></label><span class="note" id="bevnote"></span></div>
 <div class="row" style="margin-top:10px"><span class="meta">Shop at:</span><span id="stores" class="row"></span></div>
+<div class="row" style="margin-top:14px"><button class="btn" style="width:100%;padding:12px;font-size:15px;font-weight:600;background:var(--ac);color:#fff;border-color:var(--ac);text-align:center" onclick="go('plan')">View Your Meal Plan →</button></div>
 </div>
 
 <div id="plan"></div>
@@ -288,20 +289,23 @@ const G={lose:[-500,1],cut:[-750,1.1],maintain:[0,.8],lean:[250,1],bulk:[500,1]}
 const SL=[['b','Breakfast',.25],['l','Lunch',.3],['d','Dinner',.35],['s','Snack',.1]];
 const NOTE={ecto:'Ectomorph: fast metabolism, so your plan adds calories and leans on carbs. Prioritize heavy compound lifts and don’t skip meals.',meso:'Mesomorph: you respond well to both training and diet, so a balanced split of protein, carbs and fats works best.',endo:'Endomorph: you store energy easily, so your plan trims carbs a little, raises fats and favors high-fiber foods plus regular activity.'};
 const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),money=x=>'$'+x.toFixed(2),fmt=x=>+x.toFixed(2);
-let S={p:{sex:'m',age:30,ft:5,inch:9,wt:180,act:1.375,goal:'lose',arch:'auto'},bud:[10,10,10,10,10,10,10],day:0,tb:10,st:[1,1,1,1]};
+let S={p:{sex:'',age:'',ft:'',inch:'',wt:'',pp:'',act:'',goal:'',arch:'auto'},bud:[10,10,10,10,10,10,10],day:0,tb:10,st:[0,0,0,0],meals:[]};
 try{const x=JSON.parse(localStorage.getItem('bb1')||'null');if(x&&x.p&&x.bud&&x.bud.length===7)S=x}catch(e){}
-if(!S.meals||!S.meals.length)S.meals=['b','l','d'];
-if(!S.p.pp)S.p.pp=1;
+if(!S.meals)S.meals=[];
+if(!S.st)S.st=[0,0,0,0];
 if(S.bev===undefined)S.bev='';if(S.pantry===undefined)S.pantry=false;if(!S.trip)S.trip=1;if(!S.tb)S.tb=((S.bud&&S.bud[0])||10)*S.trip;
 const save=()=>{try{localStorage.setItem('bb1',JSON.stringify(S))}catch(e){}};
 let PC={},LC={};
-function calc(){const p=S.p,wt=p.wt||150,kg=wt*.4536,cm=((p.ft||5)*12+(+p.inch||0))*2.54,bmi=kg/((cm/100)**2);
+function isReady(){const p=S.p;return !!(p.wt&&p.ft&&p.age&&p.sex&&p.act&&p.goal&&S.meals.length&&S.st.some(x=>x))}
+function calc(){const p=S.p;
+if(!p.wt||!p.ft||!p.age||!p.sex||!p.act||!p.goal||!G[p.goal])return{ready:false,bmi:0,arch:'meso',tdee:0,cal:0,pro:0,fat:0,carb:0};
+const wt=+p.wt,kg=wt*.4536,cm=((+p.ft||5)*12+(+p.inch||0))*2.54,bmi=kg/((cm/100)**2);
 const arch=p.arch==='auto'?(bmi<20.5?'ecto':bmi>26?'endo':'meso'):p.arch;
-const bmr=10*kg+6.25*cm-5*(p.age||30)+(p.sex==='m'?5:-161),tdee=bmr*p.act,g=G[p.goal],loss=g[0]<0;
+const bmr=10*kg+6.25*cm-5*(+p.age)+(p.sex==='m'?5:-161),tdee=bmr*(+p.act),g=G[p.goal],loss=g[0]<0;
 const adj=arch==='ecto'?(loss?100:200):arch==='endo'?(loss?-100:0):0;
 const cal=Math.max(p.sex==='m'?1500:1200,Math.round((tdee+g[0]+adj)/10)*10);
 const pro=Math.round(wt*g[1]),fat=Math.round(cal*(arch==='endo'?.35:.27)/9),carb=Math.max(0,Math.round((cal-pro*4-fat*9)/4));
-return{bmi,arch,tdee:Math.round(tdee),cal,pro,fat,carb}}
+return{ready:true,bmi,arch,tdee:Math.round(tdee),cal,pro,fat,carb}}
 function sum(q){let c=0,p=0,cb=0,f=0,m=0;for(const k in q){const x=I[k],n=q[k];c+=x[2]*n;p+=x[3]*n;cb+=x[4]*n;f+=x[5]*n;m+=PC[k].p/PK[k][0]*n}return{c,p,cb,f,m}}
 function mk(r,tc){const b=(S.bev==='wine'&&r.s!==(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?'':(BEV[S.bev]||''),bc=b?I[b][2]:0,f=clamp((tc-bc)/sum(r.i).c,.5,2.4),q={};for(const k in r.i)q[k]=Math.max(.25,Math.round(r.i[k]*f*4)/4);if(b)q[b]=(q[b]||0)+1;return{r,q,...sum(q)}}
 const TODAY=0;
@@ -323,9 +327,14 @@ const ns={},used={};for(const k in r.agg){const have=stock[k]||0;used[k]=Math.mi
 return{pick:{m,tot},over,agg:r.agg,packs:r.packs,stock:ns,used}}
 const bar=(l,v,t,u)=>`<div class="meta">${l}: <b>${Math.round(v)}</b> / ${t} ${u}</div><div class="bar"><i style="width:${clamp(v/t*100,0,100)}%"></i></div>`;
 function render(){
-if(!S.st.some(x=>x)){S.st=[1,0,0,0];ST.forEach((s,i)=>$('st'+i).checked=!!S.st[i])}
+const t=calc(),hasStores=S.st&&S.st.some(x=>x),hasMeals=S.meals&&S.meals.length>0;
+if(!t.ready||!hasStores||!hasMeals){
+const missing=[];
+if(!S.p.sex)missing.push("Sex");if(!S.p.age)missing.push("Age");if(!S.p.ft)missing.push("Height");if(!S.p.wt)missing.push("Weight");if(!S.p.act)missing.push("Activity level");if(!S.p.goal)missing.push("Goal");if(!hasMeals)missing.push("Meals to plan");if(!hasStores)missing.push("Stores to shop at");
+let h=`<div class="card pg" data-p="plan meals shop week"><div style="text-align:center;padding:24px 8px"><div style="font-size:46px;margin-bottom:8px">🥗</div><h2 style="font-size:20px;margin:0 0 6px">Welcome to BudgetBites!</h2><p class="sub" style="margin:0 auto 16px;max-width:380px">Fill in your profile details to generate your customized calorie targets, meals, and grocery plan.</p><div style="background:var(--ac2);border-radius:12px;padding:12px 14px;margin:0 auto 16px;max-width:380px;text-align:left"><span style="font-size:12px;font-weight:600;color:var(--ac);display:block;margin-bottom:6px">PLEASE COMPLETE IN PROFILE:</span><span style="font-size:13px;color:var(--tx)">${missing.join(' · ')}</span></div><button class="btn" onclick="go('profile')" style="width:100%;max-width:320px;padding:12px;font-size:15px;font-weight:600;background:var(--ac);color:#fff;border-color:var(--ac)">Fill in Your Profile →</button></div></div>`;
+$('plan').innerHTML=h;show();return}
 PC={};LC={};for(const k in I){const a=S.st.map((on,i)=>on?pkP(k,i):Infinity),m=Math.min(...a);PC[k]={p:m,s:a.indexOf(m)}}
-const t=calc(),L=S.trip||1;let stock={};const RS=[];
+const L=S.trip||1;let stock={};const RS=[];
 let anyShort=false;for(let i0=0;i0<7;){const real=true,maxLen=Math.min(L,7-i0),stIn=stock;let len,B,days,st,spent,pk,ag,ov,rs,done=false;
 for(len=maxLen;len>=1&&!done;len--){B=S.tb;days=[...Array(len).keys()].map(j=>i0+j);
 for(const pace of len===1?[1]:[1.8,1.2]){const avoid=new Set();st=stIn;spent=0;pk={};ag={};ov=false;
@@ -362,15 +371,15 @@ ${Object.keys(agg).some(k=>(R2.used[k]||0)>.01)?`<table><tr><th colspan="2">From
 $('plan').innerHTML=h;show();const b=$('bud');b.onchange=()=>{S.tb=Math.max(1,+b.value||10);save();render()}}
 function pickDay(i){triggerHaptic('light');S.day=i;save();render()}
 function allDays(){S.bud=S.bud.map(()=>S.bud[S.day]);save();render()}
-['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);e.value=S.p[id];e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?+e.value:e.value;save();render()}});
+['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);e.value=S.p[id]!==undefined?S.p[id]:'';e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?(e.value===''?'' :+e.value):e.value;save();render()}});
 $('stores').innerHTML=ST.map((s,i)=>`<label class="ck"><input type="checkbox" id="st${i}"> ${s}</label>`).join('');
-ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!S.st[i];e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;save();render()}});
+ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!(S.st&&S.st[i]);e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;save();render()}});
 $('meals').innerHTML=SL.map(([s,n])=>`<label class="ck"><input type="checkbox" id="ml${s}"> ${n}</label>`).join('');
-SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));if(!a.length){e.checked=true;return}S.meals=a;save();render()}});
-const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bev').value;bn();save();render()};
+SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));S.meals=a;save();render()}});
+const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bevnote')?$('bev').value:'';bn();save();render()};
 $('trip').value=S.trip;$('trip').onchange=()=>{const o=S.trip||1;S.trip=+$('trip').value;S.tb=Math.round(S.tb/o*S.trip);save();render()};
 $('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{triggerHaptic('selection');S.pantry=$('pantry').checked;save();render()};
-let PAGE=(location.hash||'').slice(1);if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE='plan';
+let PAGE=(location.hash||'').slice(1);if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE=isReady()?'plan':'profile';
 function show(){document.querySelectorAll('.pg').forEach(e=>{e.style.display=e.dataset.p.split(' ').includes(PAGE)?'':'none'});document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===PAGE))}
 function go(p){triggerHaptic('selection');PAGE=p;try{location.hash=p}catch(e){}show();window.scrollTo(0,0)}
 render();
