@@ -20,7 +20,9 @@ h1{font-size:22px;margin:4px 0 2px}h2{font-size:16px;margin:0 0 8px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
 label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
-input,select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-width:0;-webkit-appearance:none}
+input:not([type="checkbox"]):not([type="radio"]),select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-width:0;-webkit-appearance:none}
+input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:20px;height:20px;margin:0;flex:0 0 20px;border:1.5px solid var(--bd);border-radius:6px;background:var(--card);display:inline-grid;place-content:center;cursor:pointer;vertical-align:middle;transition:all .15s ease-in-out;position:relative}
+input[type="checkbox"]:checked{background-color:var(--ac);border-color:var(--ac);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%23ffffff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13.485 3.515a1 1 0 0 1 0 1.414l-6.5 6.5a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6.278 9.308l5.793-5.793a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");background-size:13px 13px;background-position:center;background-repeat:no-repeat}
 select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6b61' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
 button{font:inherit;cursor:pointer;-webkit-touch-callout:none;user-select:none}
 .chips{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
@@ -28,7 +30,8 @@ button{font:inherit;cursor:pointer;-webkit-touch-callout:none;user-select:none}
 .chip small{display:block;opacity:.8}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
 .btn{padding:8px 12px;border-radius:8px;border:1px solid var(--ac);background:var(--ac2);color:var(--tx)}
-.ck{flex-direction:row;align-items:center;gap:5px;font-size:13px;color:var(--tx)}
+.ck{display:inline-flex;flex-direction:row;align-items:center;gap:7px;font-size:13px;color:var(--tx);cursor:pointer;user-select:none;-webkit-user-select:none;padding:4px 6px;border-radius:8px;transition:background-color .15s ease}
+.ck:has(input[type="checkbox"]:checked){background:var(--ac2);font-weight:600}
 .stat{background:var(--ac2);border-radius:10px;padding:8px 10px}.stat b{display:block;font-size:18px}.stat span{font-size:12px;color:var(--mu)}
 .bar{height:8px;border-radius:5px;background:var(--bd);overflow:hidden;margin:3px 0 9px}.bar i{display:block;height:100%;background:var(--ac)}
 .meal h3{margin:0;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -361,12 +364,12 @@ function pickDay(i){triggerHaptic('light');S.day=i;save();render()}
 function allDays(){S.bud=S.bud.map(()=>S.bud[S.day]);save();render()}
 ['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);e.value=S.p[id];e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?+e.value:e.value;save();render()}});
 $('stores').innerHTML=ST.map((s,i)=>`<label class="ck"><input type="checkbox" id="st${i}"> ${s}</label>`).join('');
-ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!S.st[i];e.onchange=()=>{S.st[i]=e.checked?1:0;save();render()}});
+ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!S.st[i];e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;save();render()}});
 $('meals').innerHTML=SL.map(([s,n])=>`<label class="ck"><input type="checkbox" id="ml${s}"> ${n}</label>`).join('');
-SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));if(!a.length){e.checked=true;return}S.meals=a;save();render()}});
+SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));if(!a.length){e.checked=true;return}S.meals=a;save();render()}});
 const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bev').value;bn();save();render()};
 $('trip').value=S.trip;$('trip').onchange=()=>{const o=S.trip||1;S.trip=+$('trip').value;S.tb=Math.round(S.tb/o*S.trip);save();render()};
-$('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{S.pantry=$('pantry').checked;save();render()};
+$('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{triggerHaptic('selection');S.pantry=$('pantry').checked;save();render()};
 let PAGE=(location.hash||'').slice(1);if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE='plan';
 function show(){document.querySelectorAll('.pg').forEach(e=>{e.style.display=e.dataset.p.split(' ').includes(PAGE)?'':'none'});document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===PAGE))}
 function go(p){triggerHaptic('selection');PAGE=p;try{location.hash=p}catch(e){}show();window.scrollTo(0,0)}
