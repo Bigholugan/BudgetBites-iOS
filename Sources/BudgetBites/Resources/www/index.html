@@ -1233,6 +1233,7 @@ window.onKrogerPricesError=function(err){
 };
 
 window.onKrogerCartStatus=function(res){
+  clearTimeout(window._cartSafetyTimeout);
   const fb=$('krogerCartFeedback');
   const btn=$('btnSendKrogerCart');
   if(btn)btn.disabled=false;
@@ -1410,6 +1411,18 @@ function sendItemsToKrogerCart(){
     if(fb)fb.innerHTML=`<div style="color:var(--warn);text-align:center;padding:8px;font-size:13px">No Kroger grocery items found for this trip.</div>`;
     return;
   }
+
+  clearTimeout(window._cartSafetyTimeout);
+  window._cartSafetyTimeout=setTimeout(function(){
+    const b=$('btnSendKrogerCart');
+    const f=$('krogerCartFeedback');
+    if(b&&b.disabled){
+      b.disabled=false;
+      if(f&&f.innerHTML.includes('Adding items')){
+        f.innerHTML=`<div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;color:#ef4444;text-align:center">Request timed out. Please check your connection and tap Add to Cart again.</div>`;
+      }
+    }
+  },15000);
 
   postToNative('kroger',{action:'sendCart',items:krogerItems});
 }

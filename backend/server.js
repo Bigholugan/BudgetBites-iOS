@@ -191,60 +191,71 @@ app.get('/api/kroger/prices', async (req, res) => {
     const token = await getClientCredentialsToken();
     const results = {};
 
-    // Fetch products in parallel with rate-limit batching (batches of 6)
+    // Fetch products with gentle batching & retries to prevent Kroger rate-limits
     const ingredientKeys = Object.keys(APP_INGREDIENTS);
-    const batchSize = 6;
+    const batchSize = 3;
 
     for (let i = 0; i < ingredientKeys.length; i += batchSize) {
       const batch = ingredientKeys.slice(i, i + batchSize);
       await Promise.all(batch.map(async (key) => {
-        try {
-          const cfg = APP_INGREDIENTS[key];
-          const url = new URL(`${KROGER_BASE_URL}/products`);
-          url.searchParams.append('filter.term', cfg.term);
-          url.searchParams.append('filter.locationId', locationId);
-          url.searchParams.append('filter.limit', '3');
+        const cfg = APP_INGREDIENTS[key];
+        const url = new URL(`${KROGER_BASE_URL}/products`);
+        url.searchParams.append('filter.term', cfg.term);
+        url.searchParams.append('filter.locationId', locationId);
+        url.searchParams.append('filter.limit', '3');
 
-          const response = await fetch(url.toString(), {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Accept': 'application/json'
+        // Retry loop (up to 2 attempts) for network blips
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const response = await fetch(url.toString(), {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+              }
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const items = data.data || [];
+            if (!items.length) return;
+
+            // Pick the best match with price info
+            for (const item of items) {
+              const priceInfo = item.items?.[0]?.price;
+              if (priceInfo && (priceInfo.regular || priceInfo.promo)) {
+                const regular = priceInfo.regular || priceInfo.promo;
+                const promo = priceInfo.promo > 0 && priceInfo.promo < regular ? priceInfo.promo : null;
+                const price = promo !== null ? promo : regular;
+                const size = item.items?.[0]?.size || '';
+                const upc = item.upc || item.items?.[0]?.itemId || '';
+
+                results[key] = {
+                  upc,
+                  name: item.description || cfg.term,
+                  size,
+                  regularPrice: regular,
+                  promoPrice: promo,
+                  price: price,
+                  isPromo: promo !== null,
+                  inStock: item.items?.[0]?.inventory?.stockLevel !== 'TEMPORARILY_OUT_OF_STOCK'
+                };
+                break;
+              }
             }
-          });
-
-          if (!response.ok) return;
-
-          const data = await response.json();
-          const items = data.data || [];
-          if (!items.length) return;
-
-          // Pick the best match with price info
-          for (const item of items) {
-            const priceInfo = item.items?.[0]?.price;
-            if (priceInfo && (priceInfo.regular || priceInfo.promo)) {
-              const regular = priceInfo.regular || priceInfo.promo;
-              const promo = priceInfo.promo > 0 && priceInfo.promo < regular ? priceInfo.promo : null;
-              const price = promo !== null ? promo : regular;
-              const size = item.items?.[0]?.size || '';
-              const upc = item.upc || item.items?.[0]?.itemId || '';
-
-              results[key] = {
-                upc,
-                name: item.description || cfg.term,
-                size,
-                regularPrice: regular,
-                promoPrice: promo,
-                price: price,
-                isPromo: promo !== null,
-                inStock: item.items?.[0]?.inventory?.stockLevel !== 'TEMPORARILY_OUT_OF_STOCK'
-              };
-              break;
+            break; // Success, exit retry loop
+          } catch (itemErr) {
+            if (attempt === 0) {
+              await new Promise(r => setTimeout(r, 200));
+            } else {
+              const detail = itemErr.cause ? itemErr.cause.message : itemErr.message;
+              console.warn(`Could not fetch price for ${key}: ${detail}`);
             }
           }
-        } catch (itemErr) {
-          console.warn(`Could not fetch price for ${key}:`, itemErr.message);
         }
       }));
+      // Pause between batches to respect rate limits
+      await new Promise(r => setTimeout(r, 80));
     }
 
     const payload = {
@@ -397,7 +408,7 @@ app.put('/api/kroger/cart', async (req, res) => {
       let parsedMsg = errText;
       try {
         const errObj = JSON.parse(errText);
-        parsedMsg = errObj.error_description || errObj.error || errText;
+        parsedMsg = (errObj.errors && errObj.errors[0]?.message) || errObj.error_description || errObj.error || errObj.message || errText;
       } catch (e) {}
       return res.status(response.status).json({ error: `Kroger Cart (${response.status}): ${parsedMsg}` });
     }
