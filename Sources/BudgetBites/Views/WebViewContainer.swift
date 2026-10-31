@@ -121,8 +121,10 @@ struct WebViewContainer: UIViewRepresentable {
                         let json = (try? JSONEncoder().encode(saved)).flatMap { String(data: $0, encoding: .utf8) } ?? "null"
                         self.evaluateJS("window.onKrogerStoreLoaded && window.onKrogerStoreLoaded(\(json));")
                         
-                        // Automatically fetch prices for the saved store
-                        self.loadPricesForStore(locationId: saved.locationId)
+                        // Only auto-fetch prices if a real backend is configured
+                        if KrogerService.shared.hasBackend {
+                            self.loadPricesForStore(locationId: saved.locationId)
+                        }
                     }
 
                 case "searchStores":
@@ -241,6 +243,20 @@ struct WebViewContainer: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             // Signal webview that native bridge is ready
             evaluateJS("window.isNativeApp = true; window.dispatchEvent(new Event('NativeBridgeReady'));")
+        }
+
+        // Suppress system-level navigation error alerts — the page handles errors in-app
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            let nsErr = error as NSError
+            // Ignore cancelled loads (e.g. redirects) and web-content-process crashes
+            if nsErr.code == NSURLErrorCancelled { return }
+            print("[WebView] provisional navigation failed: \(error.localizedDescription)")
+        }
+
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            let nsErr = error as NSError
+            if nsErr.code == NSURLErrorCancelled { return }
+            print("[WebView] navigation failed: \(error.localizedDescription)")
         }
     }
 }

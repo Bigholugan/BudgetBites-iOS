@@ -3,6 +3,18 @@ import UIKit
 import SafariServices
 import AuthenticationServices
 
+/// Errors specific to the Kroger integration layer.
+public enum KrogerError: LocalizedError {
+    case backendNotConfigured
+
+    public var errorDescription: String? {
+        switch self {
+        case .backendNotConfigured:
+            return "Kroger backend not configured. Add your KROGER_BACKEND_URL to Info.plist to enable live prices."
+        }
+    }
+}
+
 public struct KrogerStore: Codable, Identifiable, Equatable {
     public var id: String { locationId }
     public let locationId: String
@@ -32,15 +44,21 @@ public final class KrogerService {
     public static let shared = KrogerService()
     
     // Configurable backend URL (defaults to production backend or local)
-    public var backendBaseURL: String = "https://budgetbites-api.example.com"
+    public var backendBaseURL: String = ""
     public var clientId: String = "budgetbites-client-id"
-    public var redirectUri: String = "https://budgetbites-api.example.com/callback"
+    public var redirectUri: String = ""
     
     private let urlSession = URLSession.shared
     
     // In-memory / on-device cache for store prices: (locationId -> [ConvertedPackagePrice], timestamp)
     private var localPriceCache: [String: (timestamp: Date, prices: [String: ConvertedPackagePrice])] = [:]
     private let cacheDuration: TimeInterval = 24 * 60 * 60 // 24 hours
+
+    // Internal so WebViewContainer can check before triggering auto-fetch
+    var hasBackend: Bool {
+        guard !backendBaseURL.isEmpty else { return false }
+        return !backendBaseURL.contains("example.com")
+    }
     
     private init() {
         // Load default backend URL from Info.plist if configured
@@ -51,6 +69,10 @@ public final class KrogerService {
         if let customClientId = Bundle.main.object(forInfoDictionaryKey: "KROGER_CLIENT_ID") as? String,
            !customClientId.isEmpty {
             self.clientId = customClientId
+        }
+        if let customRedirect = Bundle.main.object(forInfoDictionaryKey: "KROGER_REDIRECT_URI") as? String,
+           !customRedirect.isEmpty {
+            self.redirectUri = customRedirect
         }
     }
     
@@ -68,6 +90,9 @@ public final class KrogerService {
     
     // MARK: - 1. Store Search
     public func fetchNearbyStores(zipCode: String? = nil, lat: Double? = nil, lon: Double? = nil) async throws -> [KrogerStore] {
+        guard hasBackend else {
+            throw KrogerError.backendNotConfigured
+        }
         var components = URLComponents(string: "\(backendBaseURL)/api/kroger/locations")!
         var queryItems: [URLQueryItem] = []
         
@@ -125,6 +150,9 @@ public final class KrogerService {
     
     // MARK: - 2. Live Price Fetching & Conversion
     public func fetchLivePrices(locationId: String) async throws -> [String: ConvertedPackagePrice] {
+        guard hasBackend else {
+            throw KrogerError.backendNotConfigured
+        }
         // Check 24-hour in-memory/device cache
         if let cached = localPriceCache[locationId],
            Date().timeIntervalSince(cached.timestamp) < cacheDuration {
@@ -211,6 +239,7 @@ public final class KrogerService {
     }
     
     public func refreshTokenViaBackend(_ refreshToken: String) async throws -> String {
+        guard hasBackend else { throw KrogerError.backendNotConfigured }
         guard let url = URL(string: "\(backendBaseURL)/api/kroger/oauth/refresh") else {
             throw URLError(.badURL)
         }
@@ -246,6 +275,7 @@ public final class KrogerService {
     
     // MARK: - 4. Add Items to Kroger Cart
     public func addToCart(items: [KrogerCartItem], presentationAnchor: ASPresentationAnchor) async throws -> Bool {
+        guard hasBackend else { throw KrogerError.backendNotConfigured }
         guard !items.isEmpty else { return true }
         
         let token = try await ensureValidToken(presentationAnchor: presentationAnchor)
