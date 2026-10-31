@@ -288,6 +288,6 @@ public final class KrogerService {
         let safariVC = SFSafariViewController(url: webCartURL)
         safariVC.modalPresentationStyle = .pageSheet
         safariVC.dismissButtonStyle = .close
-        viewController.present(safariVC, animated: true, completionHandler: nil)
+        viewController.present(safariVC, animated: true, completion: nil)
     }
 }

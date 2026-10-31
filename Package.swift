@@ -20,8 +20,7 @@ let package = Package(
             path: "Sources/BudgetBites",
             resources: [
                 .process("Resources/Assets.xcassets"),
-                .copy("Resources/www"),
-                .copy("Resources/Info.plist")
+                .copy("Resources/www")
             ]
         ),
         .testTarget(
