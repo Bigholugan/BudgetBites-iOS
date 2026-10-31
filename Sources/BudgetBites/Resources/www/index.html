@@ -342,6 +342,77 @@ td:last-child, th:last-child { text-align: right; }
   opacity: 1;
   transform: translateX(-50%) translateY(4px);
 }
+.step-progress-track {
+  height: 6px;
+  background: rgba(120, 130, 125, .22);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0 12px;
+}
+.step-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34c759, #30b0c7);
+  border-radius: 4px;
+  transition: width .35s cubic-bezier(.2, .8, .2, 1);
+}
+.step-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.step-tab {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 12px;
+  background: var(--ig);
+  border: 1px solid var(--gb);
+  color: var(--mu);
+  transition: all .2s ease;
+}
+.step-tab.on {
+  background: linear-gradient(180deg, rgba(80, 200, 120, .95), rgba(47, 125, 79, .95));
+  color: #fff;
+  border-color: rgba(255, 255, 255, .5);
+  box-shadow: 0 2px 8px rgba(47, 125, 79, .3);
+}
+.setup-screen {
+  animation: rise .25s ease both;
+}
+.step-nav-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  align-items: center;
+}
+.step-nav-row .btn {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.step-nav-row .btn-back {
+  flex: 0 0 auto;
+  min-width: 85px;
+  background: var(--ig);
+  color: var(--tx);
+  border: 1px solid var(--gb);
+}
+.step-notice {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+}
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .card, .nav, .chip, .btn, .stat { background: var(--card); }
 }
@@ -354,46 +425,166 @@ td:last-child, th:last-child { text-align: right; }
 <p class="sub">Healthy daily meals built to your goal, calories and grocery budget.</p>
 
 <div class="card pg" data-p="profile">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
     <h2 style="margin:0" id="profileHeading">Hello, <span id="helloName">there</span>! 👋</h2>
-    <span id="profileBadge" style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:8px;background:var(--ac2);color:var(--ac)">PROFILE</span>
-  </div>
-  <p class="sub" id="profileSub">Complete your profile to generate your customized calories, macros, and grocery plan.</p>
-
-  <div style="margin-bottom:12px">
-    <label style="font-size:13px;font-weight:600;color:var(--tx)">Your Name
-      <input id="uname" type="text" placeholder="e.g. Alex" maxlength="32" autocomplete="name" style="margin-top:2px">
-    </label>
+    <span id="profileBadge" style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:8px;background:rgba(52,199,89,.15);color:var(--ac)">STEP 1 OF 5</span>
   </div>
 
-  <div class="grid">
-    <label>Sex<select id="sex"><option value="" disabled selected>Select sex</option><option value="m">Male</option><option value="f">Female</option></select></label>
-    <label>Age<input id="age" type="number" min="14" max="90" placeholder="e.g. 28"></label>
-    <label>Height (ft)<input id="ft" type="number" min="3" max="7" placeholder="e.g. 5"></label>
-    <label>Height (in)<input id="inch" type="number" min="0" max="11" placeholder="e.g. 9"></label>
-    <label>Weight (lb)<input id="wt" type="number" min="80" max="500" placeholder="e.g. 165"></label>
-    <label>Portions cooked<input id="pp" type="number" min="1" max="8" placeholder="1"></label>
-    <label>Activity<select id="act"><option value="" disabled selected>Select activity</option><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
-    <label>Goal<select id="goal"><option value="" disabled selected>Select goal</option><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
-    <label>Body archetype<select id="arch"><option value="auto">Auto (from BMI)</option><option value="ecto">Ectomorph (lean, hard gainer)</option><option value="meso">Mesomorph (athletic)</option><option value="endo">Endomorph (gains easily)</option></select></label>
+  <div class="step-progress-track">
+    <div id="stepProgressBar" class="step-progress-fill" style="width:20%"></div>
   </div>
 
-  <div class="row" style="margin-top:14px"><span class="meta" style="font-weight:600">Meals to plan (budget splits evenly):</span><span id="meals" class="row"></span></div>
-
-  <div class="row" style="margin-top:12px"><label>How often do you shop?<select id="trip"><option value="1">Every day</option><option value="2">Every 2 days</option><option value="3">Every 3 days</option><option value="7">Once a week (meal prep)</option></select></label><span class="note">Your budget is for one shopping trip, spread across all the meals in it, with a different recipe each day.</span></div>
-
-  <div class="row" style="margin-top:10px"><label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label></div>
-
-  <div class="row" style="margin-top:12px"><label>Beverage with meals<select id="bev"><option value="">None</option><option value="water">Water</option><option value="tea">Unsweetened tea</option><option value="coffee">Black coffee</option><option value="milk">Milk (2%)</option><option value="sparkling">Sparkling water</option><option value="soda">Healthy soda (low sugar)</option><option value="wine">Wine (21+)</option></select></label><span class="note" id="bevnote"></span></div>
-
-  <div class="row" style="margin-top:12px"><span class="meta" style="font-weight:600">Shop at:</span><span id="stores" class="row"></span></div>
-
-  <div id="missingNotice" style="display:none;margin-top:14px;padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;color:var(--tx);font-size:13px">
-    <b style="color:#ef4444;display:block;margin-bottom:4px">Please complete required fields:</b>
-    <span id="missingList"></span>
+  <div class="step-tabs">
+    <button class="step-tab on" id="stab1" onclick="setStep(1)">1. Basics</button>
+    <button class="step-tab" id="stab2" onclick="setStep(2)">2. Body</button>
+    <button class="step-tab" id="stab3" onclick="setStep(3)">3. Goals</button>
+    <button class="step-tab" id="stab4" onclick="setStep(4)">4. Meals</button>
+    <button class="step-tab" id="stab5" onclick="setStep(5)">5. Stores</button>
   </div>
 
-  <div class="row" style="margin-top:16px"><button class="btn btn-primary" id="btn-save-profile" style="width:100%;padding:14px;font-size:15px;text-align:center" onclick="completeProfile()">Save Profile &amp; Generate Meal Plan →</button></div>
+  <!-- Step 1: Welcome & About You -->
+  <div class="setup-screen" id="step1">
+    <p class="sub" style="margin-bottom:14px">Welcome to BudgetBites! Let's get to know you to personalize your nutrition targets.</p>
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:600;color:var(--tx)">Your Name
+        <input id="uname" type="text" placeholder="Enter your name" maxlength="32" autocomplete="name" style="margin-top:2px">
+      </label>
+    </div>
+    <div class="grid">
+      <label>Sex
+        <select id="sex">
+          <option value="" disabled selected>Select sex</option>
+          <option value="m">Male</option>
+          <option value="f">Female</option>
+        </select>
+      </label>
+      <label>Age
+        <input id="age" type="number" min="14" max="90" placeholder="e.g. 28">
+      </label>
+    </div>
+    <div id="missingNotice1" class="step-notice" style="display:none"></div>
+    <div class="step-nav-row">
+      <button class="btn btn-primary" onclick="nextStep()">Continue to Body Stats →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Body & Cooking Metrics -->
+  <div class="setup-screen" id="step2" style="display:none">
+    <p class="sub" style="margin-bottom:14px">Your measurements allow us to calculate your basal metabolic rate and daily calorie needs.</p>
+    <div class="grid">
+      <label>Height (ft)<input id="ft" type="number" min="3" max="7" placeholder="e.g. 5"></label>
+      <label>Height (in)<input id="inch" type="number" min="0" max="11" placeholder="e.g. 9"></label>
+      <label>Weight (lb)<input id="wt" type="number" min="80" max="500" placeholder="e.g. 165"></label>
+      <label>Portions cooked<input id="pp" type="number" min="1" max="8" placeholder="1"></label>
+      <label style="grid-column: 1 / -1">Body archetype
+        <select id="arch">
+          <option value="auto">Auto (from BMI)</option>
+          <option value="ecto">Ectomorph (lean, hard gainer)</option>
+          <option value="meso">Mesomorph (athletic)</option>
+          <option value="endo">Endomorph (gains easily)</option>
+        </select>
+      </label>
+    </div>
+    <div id="missingNotice2" class="step-notice" style="display:none"></div>
+    <div class="step-nav-row">
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue to Goals →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Lifestyle & Goals -->
+  <div class="setup-screen" id="step3" style="display:none">
+    <p class="sub" style="margin-bottom:14px">Tell us about your daily activity routine and primary dietary goal.</p>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <label>Daily Activity Level
+        <select id="act">
+          <option value="" disabled selected>Select activity</option>
+          <option value="1.2">Sedentary (desk job, little exercise)</option>
+          <option value="1.375">Light (exercise 1–3 days/wk)</option>
+          <option value="1.55">Moderate (exercise 3–5 days/wk)</option>
+          <option value="1.725">Very active (intense 6–7 days/wk)</option>
+        </select>
+      </label>
+      <label>Fitness / Body Goal
+        <select id="goal">
+          <option value="" disabled selected>Select goal</option>
+          <option value="lose">Lose weight (-500 kcal/day)</option>
+          <option value="cut">Cut / lean out (-750 kcal/day)</option>
+          <option value="maintain">Maintain current weight</option>
+          <option value="lean">Build lean muscle (+250 kcal/day)</option>
+          <option value="bulk">Bulk (+500 kcal/day)</option>
+        </select>
+      </label>
+    </div>
+    <div id="missingNotice3" class="step-notice" style="display:none"></div>
+    <div class="step-nav-row">
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue to Meals →</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Meal & Shopping Preferences -->
+  <div class="setup-screen" id="step4" style="display:none">
+    <p class="sub" style="margin-bottom:14px">Choose which meals you'd like planned each day and how often you shop.</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <span class="meta" style="font-weight:600;display:block;margin-bottom:6px">Meals to plan (budget splits evenly):</span>
+        <span id="meals" class="row"></span>
+      </div>
+      <div>
+        <label>How often do you shop?
+          <select id="trip">
+            <option value="1">Every day</option>
+            <option value="2">Every 2 days</option>
+            <option value="3">Every 3 days</option>
+            <option value="7">Once a week (meal prep)</option>
+          </select>
+        </label>
+        <span class="note" style="margin-top:4px">Your grocery budget spreads across all the meals in the trip.</span>
+      </div>
+      <div>
+        <label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label>
+      </div>
+      <div>
+        <label>Beverage with meals
+          <select id="bev">
+            <option value="">None</option>
+            <option value="water">Water</option>
+            <option value="tea">Unsweetened tea</option>
+            <option value="coffee">Black coffee</option>
+            <option value="milk">Milk (2%)</option>
+            <option value="sparkling">Sparkling water</option>
+            <option value="soda">Healthy soda (low sugar)</option>
+            <option value="wine">Wine (21+)</option>
+          </select>
+        </label>
+        <span class="note" id="bevnote" style="margin-top:3px"></span>
+      </div>
+    </div>
+    <div id="missingNotice4" class="step-notice" style="display:none"></div>
+    <div class="step-nav-row">
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Continue to Stores →</button>
+    </div>
+  </div>
+
+  <!-- Step 5: Grocery Stores & Finalize -->
+  <div class="setup-screen" id="step5" style="display:none">
+    <p class="sub" style="margin-bottom:14px">Select the stores in your area. We compare package costs to get you the best prices.</p>
+    <div style="margin-bottom:14px">
+      <span class="meta" style="font-weight:600;display:block;margin-bottom:8px">Preferred stores:</span>
+      <span id="stores" class="row"></span>
+    </div>
+    <div style="background:var(--ig);border:1px solid var(--gb);border-radius:14px;padding:12px;margin-top:10px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">✨ Setup Almost Complete</div>
+      <div class="meta">We'll generate customized daily calorie targets, macros, rotating healthy recipes, and a grocery shopping list.</div>
+    </div>
+    <div id="missingNotice5" class="step-notice" style="display:none"></div>
+    <div class="step-nav-row">
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn-finish-setup" onclick="nextStep()">Complete Setup &amp; View Plan 🚀</button>
+    </div>
+  </div>
 </div>
 
 <div id="plan"></div>
@@ -609,52 +800,106 @@ if(S.bev===undefined)S.bev='';if(S.pantry===undefined)S.pantry=false;if(!S.trip)
 const save=()=>{try{localStorage.setItem('bb1',JSON.stringify(S))}catch(e){}};
 let PC={},LC={};
 function isReady(){const p=S.p;return !!(p&&p.name&&p.name.trim()&&p.wt&&p.ft&&p.age&&p.sex&&p.act&&p.goal&&S.meals.length&&S.st.some(x=>x))}
-function updateGreeting(){
-  const name=(S.p.name||'').trim();
-  const el=$('helloName');
-  if(el) el.textContent=name||'there';
-  const rdy=isReady();
-  const badge=$('profileBadge');
-  if(badge){
-    badge.textContent=rdy?'READY':'SETUP REQUIRED';
-    badge.style.background=rdy?'var(--ac2)':'rgba(239,68,68,0.15)';
-    badge.style.color=rdy?'var(--ac)':'#ef4444';
+
+let CURRENT_STEP = 1;
+
+function validateStep(s) {
+  const p = S.p;
+  if (s === 1) {
+    if (!p.name || !p.name.trim()) return "Please enter your name";
+    if (!p.sex) return "Please select your sex";
+    if (!p.age || +p.age < 14) return "Please enter your age (14+)";
+  } else if (s === 2) {
+    if (!p.ft || +p.ft < 3) return "Please enter your height in feet";
+    if (!p.wt || +p.wt < 50) return "Please enter your weight in lbs";
+  } else if (s === 3) {
+    if (!p.act) return "Please select your activity level";
+    if (!p.goal) return "Please select your primary goal";
+  } else if (s === 4) {
+    if (!S.meals || !S.meals.length) return "Please select at least one meal to plan";
+  } else if (s === 5) {
+    if (!S.st || !S.st.some(x => x)) return "Please select at least one store to shop at";
   }
-  const sub=$('profileSub');
-  if(sub) sub.textContent=rdy?'Your personalized body stats, nutrition targets, and shopping settings.':'Complete your profile to generate your customized calories, macros, and grocery plan.';
-  const btn=$('btn-save-profile');
-  if(btn) btn.textContent=rdy?'Update Profile & View Plan →':'Save Profile & Generate Meal Plan →';
-  const notice=$('missingNotice');
-  if(notice && rdy) notice.style.display='none';
+  return null;
 }
-function completeProfile(){
-  const p=S.p,hasStores=S.st&&S.st.some(x=>x),hasMeals=S.meals&&S.meals.length>0;
-  const missing=[];
-  if(!p.name||!p.name.trim())missing.push("Your Name");
-  if(!p.sex)missing.push("Sex");
-  if(!p.age)missing.push("Age");
-  if(!p.ft)missing.push("Height (ft)");
-  if(!p.wt)missing.push("Weight (lb)");
-  if(!p.act)missing.push("Activity level");
-  if(!p.goal)missing.push("Goal");
-  if(!hasMeals)missing.push("At least one Meal to plan");
-  if(!hasStores)missing.push("At least one Store to shop at");
-  const notice=$('missingNotice');
-  if(missing.length>0){
+
+function nextStep() {
+  const err = validateStep(CURRENT_STEP);
+  const notice = $('missingNotice' + CURRENT_STEP);
+  if (err) {
     triggerHaptic('warning');
-    if(notice){
-      notice.style.display='block';
-      $('missingList').textContent=missing.join(', ');
-      notice.scrollIntoView({behavior:'smooth',block:'nearest'});
+    if (notice) {
+      notice.style.display = 'block';
+      notice.textContent = err;
     }
-    showToast("Please fill in: "+missing[0]);
+    showToast(err);
     return;
   }
-  if(notice) notice.style.display='none';
-  triggerHaptic('success');
-  save();
-  showToast("Profile ready! Loading plan...");
-  go('plan');
+  if (notice) notice.style.display = 'none';
+
+  if (CURRENT_STEP < 5) {
+    triggerHaptic('light');
+    setStep(CURRENT_STEP + 1);
+  } else {
+    triggerHaptic('success');
+    save();
+    showToast("Profile complete! Generating your plan...");
+    go('plan');
+  }
+}
+
+function prevStep() {
+  if (CURRENT_STEP > 1) {
+    triggerHaptic('light');
+    setStep(CURRENT_STEP - 1);
+  }
+}
+
+function setStep(step) {
+  if (!isReady() && step > CURRENT_STEP) {
+    for (let s = 1; s < step; s++) {
+      const err = validateStep(s);
+      if (err) {
+        triggerHaptic('warning');
+        showToast("Please complete Step " + s + " first: " + err);
+        return;
+      }
+    }
+  }
+  CURRENT_STEP = step;
+  for (let i = 1; i <= 5; i++) {
+    const screen = $('step' + i);
+    const tab = $('stab' + i);
+    if (screen) screen.style.display = (i === step) ? 'block' : 'none';
+    if (tab) tab.classList.toggle('on', i === step);
+  }
+  const bar = $('stepProgressBar');
+  if (bar) bar.style.width = (step * 20) + '%';
+  updateGreeting();
+  window.scrollTo(0, 0);
+}
+
+function updateGreeting() {
+  const name = (S.p.name || '').trim();
+  const el = $('helloName');
+  if (el) el.textContent = name || 'there';
+  const rdy = isReady();
+  const badge = $('profileBadge');
+  if (badge) {
+    if (rdy) {
+      badge.textContent = 'READY · STEP ' + CURRENT_STEP + '/5';
+      badge.style.background = 'var(--ac2)';
+      badge.style.color = 'var(--ac)';
+    } else {
+      badge.textContent = 'STEP ' + CURRENT_STEP + ' OF 5';
+      badge.style.background = 'rgba(52, 199, 89, 0.15)';
+      badge.style.color = 'var(--ac)';
+    }
+  }
+  const finishBtn = $('btn-finish-setup');
+  if (finishBtn) {
+    finishBtn.textContent = rdy ? 'Save & View Plan →' : 'Complete Setup & View Plan 🚀';
+  }
 }
 function calc(){const p=S.p;
 if(!p.wt||!p.ft||!p.age||!p.sex||!p.act||!p.goal||!G[p.goal])return{ready:false,bmi:0,arch:'meso',tdee:0,cal:0,pro:0,fat:0,carb:0};
@@ -737,15 +982,17 @@ if(unameEl){
   unameEl.value=S.p.name||'';
   unameEl.oninput=()=>{
     S.p.name=unameEl.value;
+    const n=$('missingNotice1');
+    if(n) n.style.display='none';
     updateGreeting();
     save();
   };
 }
-['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);if(!e)return;e.value=S.p[id]!==undefined?S.p[id]:'';e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?(e.value===''?'' :+e.value):e.value;updateGreeting();save();render()}});
+['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);if(!e)return;e.value=S.p[id]!==undefined?S.p[id]:'';e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?(e.value===''?'' :+e.value):e.value;const n=$('missingNotice'+CURRENT_STEP);if(n)n.style.display='none';updateGreeting();save();render()}});
 $('stores').innerHTML=ST.map((s,i)=>`<label class="ck"><input type="checkbox" id="st${i}"> ${s}</label>`).join('');
-ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!(S.st&&S.st[i]);e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;updateGreeting();save();render()}});
+ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!(S.st&&S.st[i]);e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;const n=$('missingNotice5');if(n)n.style.display='none';updateGreeting();save();render()}});
 $('meals').innerHTML=SL.map(([s,n])=>`<label class="ck"><input type="checkbox" id="ml${s}"> ${n}</label>`).join('');
-SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));S.meals=a;updateGreeting();save();render()}});
+SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));S.meals=a;const n=$('missingNotice4');if(n)n.style.display='none';updateGreeting();save();render()}});
 const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bev').value;bn();save();render()};
 $('trip').value=S.trip;$('trip').onchange=()=>{const o=S.trip||1;S.trip=+$('trip').value;S.tb=Math.round(S.tb/o*S.trip);save();render()};
 $('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{triggerHaptic('selection');S.pantry=$('pantry').checked;save();render()};
@@ -762,7 +1009,7 @@ function show(){
 function go(p){
   if(p!=='profile'&&!isReady()){
     triggerHaptic('warning');
-    showToast("Please complete your profile first!");
+    showToast("Please complete your profile setup first!");
     PAGE='profile';
     show();
     window.scrollTo(0,0);
@@ -774,5 +1021,6 @@ function go(p){
   show();
   window.scrollTo(0,0);
 }
+setStep(1);
 render();
 </script></body></html>
