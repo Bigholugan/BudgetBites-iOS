@@ -1412,6 +1412,10 @@ function sendItemsToKrogerCart(){
     return;
   }
 
+  if(fb){
+    fb.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:13px">${KROGER_ACCOUNT_LINKED ? 'Adding ' + krogerItems.length + ' items directly to your Kroger cart...' : 'Connecting to Kroger... (Opening sign-in window)'}</div>`;
+  }
+
   clearTimeout(window._cartSafetyTimeout);
   window._cartSafetyTimeout=setTimeout(function(){
     const b=$('btnSendKrogerCart');

@@ -286,7 +286,11 @@ struct WebViewContainer: UIViewRepresentable {
 
         private func evaluateJS(_ script: String) {
             DispatchQueue.main.async {
-                self.webView?.evaluateJavaScript(script, completionHandler: nil)
+                self.webView?.evaluateJavaScript(script) { _, error in
+                    if let error = error {
+                        print("[WebView JS Error]: \(error.localizedDescription) for script: \(script.prefix(80))")
+                    }
+                }
             }
         }
 

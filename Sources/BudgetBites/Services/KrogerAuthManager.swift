@@ -104,8 +104,12 @@ public final class KrogerAuthManager: NSObject, ASWebAuthenticationPresentationC
             
             session.presentationContextProvider = self
             session.prefersEphemeralWebBrowserSession = false
+            self.authSession?.cancel()
             self.authSession = session
-            session.start()
+            let started = session.start()
+            if !started {
+                continuation.resume(throwing: AuthError.tokenExchangeFailed("Could not start Kroger sign-in session. Please try again."))
+            }
         }
         
         // Extract auth code or error from callback URL

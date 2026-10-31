@@ -317,6 +317,34 @@ public final class KrogerService {
         request.httpBody = try JSONSerialization.data(withJSONObject: payload)
         
         let (data, response) = try await urlSession.data(for: request)
+        if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+            // Token expired or invalid — refresh or re-authenticate, then retry once
+            let refreshedToken: String
+            if let refreshToken = KeychainManager.shared.getString(forKey: .refreshToken), !refreshToken.isEmpty {
+                refreshedToken = try await refreshTokenViaBackend(refreshToken)
+            } else {
+                refreshedToken = try await KrogerAuthManager.shared.authenticate(
+                    backendBaseURL: backendBaseURL,
+                    clientId: clientId,
+                    redirectUri: redirectUri,
+                    anchor: presentationAnchor
+                )
+            }
+
+            var retryReq = URLRequest(url: url)
+            retryReq.httpMethod = "PUT"
+            retryReq.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            retryReq.setValue("Bearer \(refreshedToken)", forHTTPHeaderField: "Authorization")
+            retryReq.httpBody = request.httpBody
+
+            let (retryData, retryResp) = try await urlSession.data(for: retryReq)
+            guard let retryHttp = retryResp as? HTTPURLResponse, (200...299).contains(retryHttp.statusCode) else {
+                let msg = String(data: retryData, encoding: .utf8) ?? "Cart API failure after authentication"
+                throw NSError(domain: "KrogerService", code: 400, userInfo: [NSLocalizedDescriptionKey: msg])
+            }
+            return true
+        }
+
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             let msg = String(data: data, encoding: .utf8) ?? "Cart API failure"
             throw NSError(domain: "KrogerService", code: 400, userInfo: [NSLocalizedDescriptionKey: msg])
