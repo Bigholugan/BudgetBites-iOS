@@ -8,6 +8,14 @@
 <link rel="apple-touch-icon" href="icon-512.png">
 <link rel="manifest" href="manifest.json">
 <title>BudgetBites – Daily Meal Planner</title>
+<script>
+/* Apply saved theme immediately to avoid flash of wrong theme */
+(function(){
+  var t=localStorage.getItem('bb_theme');
+  if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
+  else if(t==='light') document.documentElement.setAttribute('data-theme','light');
+})();
+</script>
 <style>
 :root {
   --bg: #f6f7f2;
@@ -420,7 +428,46 @@ td:last-child, th:last-child { text-align: right; }
   .pg, .rc { animation: none; }
   * { transition: none !important; }
 }
-</style></head><body><div class="wrap">
+/* Dark mode toggle button */
+#darkToggle {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--gb);
+  background: var(--g);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 4px 14px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .18s ease, background .2s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+#darkToggle:active { transform: scale(.88); }
+#darkToggle svg {
+  width: 19px;
+  height: 19px;
+  stroke: var(--tx);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+</style></head><body>
+
+<!-- Dark Mode Toggle (fixed, always visible) -->
+<button id="darkToggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg id="iconSun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+  <svg id="iconMoon" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+</button>
+
+<div class="wrap">
 <h1><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 13 11"/></svg></span>BudgetBites</h1>
 <p class="sub">Healthy daily meals built to your goal, calories and grocery budget.</p>
 
@@ -637,6 +684,42 @@ function triggerHaptic(type) {
     }
   } catch(e) {}
 }
+
+/* ── Dark Mode ── */
+function applyTheme(theme) {
+  const root = document.documentElement;
+  const sun = document.getElementById('iconSun');
+  const moon = document.getElementById('iconMoon');
+  if (theme === 'dark') {
+    root.setAttribute('data-theme', 'dark');
+    if (sun) sun.style.display = 'none';
+    if (moon) moon.style.display = '';
+  } else {
+    root.removeAttribute('data-theme');
+    if (sun) sun.style.display = '';
+    if (moon) moon.style.display = 'none';
+  }
+  // Sync native WebView background
+  try {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.haptic) {
+      // Reuse haptic channel not available — notify via theme change if bridge supports it
+    }
+  } catch(e) {}
+}
+
+function toggleDarkMode() {
+  triggerHaptic('selection');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  try { localStorage.setItem('bb_theme', next); } catch(e) {}
+  applyTheme(next);
+}
+
+// Restore icons on load (theme was set in <head> but icons need updating after DOM is ready)
+(function initThemeIcons() {
+  const saved = document.documentElement.getAttribute('data-theme');
+  applyTheme(saved === 'dark' ? 'dark' : 'light');
+})();
 
 function showToast(msg) {
   let t = document.getElementById('toast');

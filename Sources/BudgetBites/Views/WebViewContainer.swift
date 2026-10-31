@@ -4,6 +4,8 @@ import SafariServices
 import AuthenticationServices
 
 struct WebViewContainer: UIViewRepresentable {
+    @Environment(\.colorScheme) var colorScheme
+
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
@@ -26,7 +28,11 @@ struct WebViewContainer: UIViewRepresentable {
         webView.scrollView.bounces = true
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 246/255, green: 247/255, blue: 242/255, alpha: 1.0)
+
+        // Match background to current color scheme to eliminate white flash
+        webView.backgroundColor = colorScheme == .dark
+            ? UIColor(red: 17/255, green: 22/255, blue: 17/255, alpha: 1.0)
+            : UIColor(red: 246/255, green: 247/255, blue: 242/255, alpha: 1.0)
 
         // Locate bundled index.html across SwiftPM (xtool) and Xcode bundles
         var targetURL: URL?
@@ -51,7 +57,12 @@ struct WebViewContainer: UIViewRepresentable {
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        // Update the webview background when the system color scheme changes
+        uiView.backgroundColor = colorScheme == .dark
+            ? UIColor(red: 17/255, green: 22/255, blue: 17/255, alpha: 1.0)
+            : UIColor(red: 246/255, green: 247/255, blue: 242/255, alpha: 1.0)
+    }
 
     class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         var parent: WebViewContainer
