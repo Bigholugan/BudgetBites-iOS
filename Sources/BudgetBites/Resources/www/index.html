@@ -9,70 +9,405 @@
 <link rel="manifest" href="manifest.json">
 <title>BudgetBites – Daily Meal Planner</title>
 <style>
-:root{--bg:#f6f7f2;--card:#fff;--tx:#1d2a1f;--mu:#5f6b61;--ac:#2f7d4f;--ac2:#e6f2ea;--bd:#dfe4da;--warn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111611;--card:#1a221b;--tx:#e8efe9;--mu:#9aa89d;--ac:#4fae75;--ac2:#1f3326;--bd:#2c382d;--warn:#f59e0b}}
-:root[data-theme="dark"]{--bg:#111611;--card:#1a221b;--tx:#e8efe9;--mu:#9aa89d;--ac:#4fae75;--ac2:#1f3326;--bd:#2c382d;--warn:#f59e0b}
-html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-.wrap{max-width:760px;margin:0 auto;padding:14px;padding-top:calc(14px + env(safe-area-inset-top, 0px));padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px))}
-h1{font-size:22px;margin:4px 0 2px}h2{font-size:16px;margin:0 0 8px}
-.sub{color:var(--mu);font-size:13px;margin:0 0 6px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
-label{font-size:12px;color:var(--mu);display:flex;flex-direction:column;gap:3px}
-input:not([type="checkbox"]):not([type="radio"]),select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);min-width:0;-webkit-appearance:none}
-input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:20px;height:20px;margin:0;flex:0 0 20px;border:1.5px solid var(--bd);border-radius:6px;background:var(--card);display:inline-grid;place-content:center;cursor:pointer;vertical-align:middle;transition:all .15s ease-in-out;position:relative}
-input[type="checkbox"]:checked{background-color:var(--ac);border-color:var(--ac);background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%23ffffff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13.485 3.515a1 1 0 0 1 0 1.414l-6.5 6.5a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6.278 9.308l5.793-5.793a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");background-size:13px 13px;background-position:center;background-repeat:no-repeat}
-select{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6b61' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
-button{font:inherit;cursor:pointer;-webkit-touch-callout:none;user-select:none}
-.chips{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-.chip{flex:0 0 auto;min-width:58px;text-align:center;padding:7px 8px;border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);font-size:13px}
-.chip small{display:block;opacity:.8}.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
-.btn{padding:8px 12px;border-radius:8px;border:1px solid var(--ac);background:var(--ac2);color:var(--tx)}
-.ck{display:inline-flex;flex-direction:row;align-items:center;gap:7px;font-size:13px;color:var(--tx);cursor:pointer;user-select:none;-webkit-user-select:none;padding:4px 6px;border-radius:8px;transition:background-color .15s ease}
-.ck:has(input[type="checkbox"]:checked){background:var(--ac2);font-weight:600}
-.stat{background:var(--ac2);border-radius:10px;padding:8px 10px}.stat b{display:block;font-size:18px}.stat span{font-size:12px;color:var(--mu)}
-.bar{height:8px;border-radius:5px;background:var(--bd);overflow:hidden;margin:3px 0 9px}.bar i{display:block;height:100%;background:var(--ac)}
-.meal h3{margin:0;font-size:15px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ac)}
-.meta{font-size:12px;color:var(--mu)}
-ul,ol{margin:6px 0;padding-left:20px}li{margin:2px 0}
-.warn{color:var(--warn);font-weight:600}
-table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:5px 4px;border-bottom:1px solid var(--bd);text-align:left}td:last-child,th:last-child{text-align:right}
-.best{color:var(--ac);font-weight:600}
-.note{font-size:12px;color:var(--mu)}
-.nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:2px;background:var(--card);border-top:1px solid var(--bd);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.nv{flex:1;border:0;background:none;color:var(--mu);font-size:11px;padding:5px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:10px}
-.nv b{font-size:18px;font-weight:400}.nv.on{color:var(--ac);font-weight:600;background:var(--ac2)}
+:root {
+  --bg: #f6f7f2;
+  --card: #fff;
+  --tx: #1d2a1f;
+  --mu: #5f6b61;
+  --ac: #2f7d4f;
+  --ac2: #e6f2ea;
+  --bd: #dfe4da;
+  --warn: #b45309;
+  --g: rgba(255, 255, 255, .55);
+  --gb: rgba(255, 255, 255, .75);
+  --ig: rgba(255, 255, 255, .55);
+  --gs: 0 10px 30px rgba(40, 70, 50, .12), inset 0 1px 0 rgba(255, 255, 255, .8);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111611;
+    --card: #1a221b;
+    --tx: #e8efe9;
+    --mu: #9aa89d;
+    --ac: #4fae75;
+    --ac2: #1f3326;
+    --bd: #2c382d;
+    --warn: #f59e0b;
+    --g: rgba(34, 46, 38, .52);
+    --gb: rgba(255, 255, 255, .15);
+    --ig: rgba(255, 255, 255, .08);
+    --gs: 0 10px 30px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .12);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111611;
+  --card: #1a221b;
+  --tx: #e8efe9;
+  --mu: #9aa89d;
+  --ac: #4fae75;
+  --ac2: #1f3326;
+  --bd: #2c382d;
+  --warn: #f59e0b;
+  --g: rgba(34, 46, 38, .52);
+  --gb: rgba(255, 255, 255, .15);
+  --ig: rgba(255, 255, 255, .08);
+  --gs: 0 10px 30px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--tx);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(60vmax 50vmax at 8% 0%, rgba(52, 199, 89, .30), transparent 60%),
+              radial-gradient(50vmax 45vmax at 98% 18%, rgba(10, 132, 255, .24), transparent 60%),
+              radial-gradient(55vmax 50vmax at 40% 100%, rgba(255, 159, 10, .22), transparent 60%);
+  pointer-events: none;
+}
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 14px;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+}
+h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin: 4px 0 2px; }
+h2 { font-size: 17px; font-weight: 650; letter-spacing: -.01em; margin: 0 0 8px; }
+.sub { color: var(--mu); font-size: 13px; margin: 0 0 8px; }
+.logo {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #4cd37b, #2f7d4f);
+  vertical-align: -7px;
+  margin-right: 9px;
+  box-shadow: 0 4px 12px rgba(47, 125, 79, .35), inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+.logo svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.card {
+  background: var(--g);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--gb);
+  border-radius: 24px;
+  box-shadow: var(--gs);
+  padding: 16px;
+  margin: 12px 0;
+}
+.stat {
+  background: var(--ig);
+  border: 1px solid var(--gb);
+  border-radius: 16px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  padding: 10px 12px;
+}
+.stat b { display: block; font-size: 18px; }
+.stat span { font-size: 12px; color: var(--mu); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); gap: 10px; }
+label { font-size: 12px; color: var(--mu); display: flex; flex-direction: column; gap: 4px; }
+input:not([type="checkbox"]):not([type="radio"]), select {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--gb);
+  border-radius: 12px;
+  background: var(--ig);
+  color: var(--tx);
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  transition: box-shadow .2s, border-color .2s;
+}
+input:focus, select:focus {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, .28);
+}
+select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235f6b61' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  flex: 0 0 20px;
+  border: 1.5px solid var(--gb);
+  border-radius: 6px;
+  background: var(--ig);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all .15s ease-in-out;
+  position: relative;
+}
+input[type="checkbox"]:checked {
+  background-color: var(--ac);
+  border-color: var(--ac);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%23ffffff' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M13.485 3.515a1 1 0 0 1 0 1.414l-6.5 6.5a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414L6.278 9.308l5.793-5.793a1 1 0 0 1 1.414 0z'/%3E%3C/svg%3E");
+  background-size: 13px 13px;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 8px rgba(52, 199, 89, .35);
+}
+.ck {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--tx);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--ig);
+  border: 1px solid var(--gb);
+  transition: all .15s ease;
+}
+.ck:has(input[type="checkbox"]:checked) {
+  background: rgba(52, 199, 89, .2);
+  border-color: rgba(52, 199, 89, .4);
+  font-weight: 600;
+}
+button { font: inherit; cursor: pointer; -webkit-touch-callout: none; user-select: none; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.chip {
+  flex: 0 0 auto;
+  min-width: 58px;
+  text-align: center;
+  padding: 7px 10px;
+  border: 1px solid var(--gb);
+  border-radius: 16px;
+  background: var(--g);
+  color: var(--tx);
+  font-size: 13px;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--gs);
+  transition: transform .15s, background .2s;
+}
+.chip small { display: block; opacity: .8; font-size: 10px; margin-top: 2px; }
+.chip.on {
+  background: linear-gradient(180deg, rgba(80, 200, 120, .95), rgba(47, 125, 79, .95));
+  border-color: rgba(255, 255, 255, .5);
+  color: #fff;
+}
+.chip:active, .btn:active, .nv:active { transform: scale(.96); }
+.row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.btn {
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--gb);
+  background: var(--g);
+  color: var(--tx);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  transition: transform .15s, background .2s, box-shadow .2s;
+}
+.btn-primary {
+  background: linear-gradient(145deg, #4cd37b, #2f7d4f);
+  color: #fff;
+  border-color: rgba(255, 255, 255, .3);
+  box-shadow: 0 4px 15px rgba(47, 125, 79, .35);
+  font-weight: 600;
+}
+.meal h3 { margin: 0; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.tag { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ac); font-weight: 600; }
+.meta { font-size: 12px; color: var(--mu); }
+ul, ol { margin: 6px 0; padding-left: 20px; }
+li { margin: 2px 0; }
+.warn { color: var(--warn); font-weight: 600; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+td, th { padding: 6px 4px; border-bottom: 1px solid rgba(120, 130, 125, .2); text-align: left; }
+td:last-child, th:last-child { text-align: right; }
+.best { color: var(--ac); font-weight: 600; }
+.note { font-size: 12px; color: var(--mu); }
+.rings { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 14px 8px; margin-top: 6px; }
+.rg { text-align: center; }
+.rw { position: relative; width: min(100%, 104px); margin: 0 auto; }
+.rw svg { display: block; width: 100%; filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .12)); }
+.rt, .rc { fill: none; stroke-width: 9; }
+.rt { stroke: rgba(120, 130, 125, .22); }
+.rc { stroke-linecap: round; animation: ringfill .9s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes ringfill { from { stroke-dashoffset: 251.3; } }
+.rv { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.15; }
+.rv b { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.rv span { font-size: 10px; color: var(--mu); }
+.rl { font-size: 12px; font-weight: 600; margin-top: 5px; }
+.nav {
+  position: fixed;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  width: calc(100% - 24px);
+  max-width: 560px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 6px;
+  border-radius: 28px;
+  background: var(--g);
+  border: 1px solid var(--gb);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  backdrop-filter: blur(30px) saturate(200%);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .7);
+  display: flex;
+  gap: 4px;
+  z-index: 50;
+}
+.nv {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: var(--mu);
+  font-size: 11px;
+  padding: 6px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border-radius: 22px;
+  transition: background .2s, transform .15s, color .2s;
+}
+.nv svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: fill .2s, stroke .2s;
+}
+.nv.on {
+  color: var(--ac);
+  font-weight: 600;
+  background: rgba(52, 199, 89, .2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .55);
+}
+.nv.on svg {
+  fill: rgba(52, 199, 89, .28);
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.pg { animation: rise .3s ease both; }
+.toast {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(25, 35, 28, 0.94);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease, transform .25s ease;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  text-align: center;
+  max-width: 90%;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(4px);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card, .nav, .chip, .btn, .stat { background: var(--card); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pg, .rc { animation: none; }
+  * { transition: none !important; }
+}
 </style></head><body><div class="wrap">
-<h1>🥗 BudgetBites</h1>
+<h1><span class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 13 11"/></svg></span>BudgetBites</h1>
 <p class="sub">Healthy daily meals built to your goal, calories and grocery budget.</p>
 
-<div class="card pg" data-p="profile"><h2>Your profile</h2>
-<div class="grid">
-<label>Sex<select id="sex"><option value="" disabled selected>Select sex</option><option value="m">Male</option><option value="f">Female</option></select></label>
-<label>Age<input id="age" type="number" min="14" max="90" placeholder="e.g. 28"></label>
-<label>Height (ft)<input id="ft" type="number" min="3" max="7" placeholder="e.g. 5"></label>
-<label>Height (in)<input id="inch" type="number" min="0" max="11" placeholder="e.g. 9"></label>
-<label>Weight (lb)<input id="wt" type="number" min="80" max="500" placeholder="e.g. 165"></label>
-<label>Portions cooked<input id="pp" type="number" min="1" max="8" placeholder="1"></label>
-<label>Activity<select id="act"><option value="" disabled selected>Select activity</option><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
-<label>Goal<select id="goal"><option value="" disabled selected>Select goal</option><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
-<label>Body archetype<select id="arch"><option value="auto">Auto (from BMI)</option><option value="ecto">Ectomorph (lean, hard gainer)</option><option value="meso">Mesomorph (athletic)</option><option value="endo">Endomorph (gains easily)</option></select></label>
-</div>
-<div class="row" style="margin-top:10px"><span class="meta">Meals to plan (budget splits evenly):</span><span id="meals" class="row"></span></div>
-<div class="row" style="margin-top:10px"><label>How often do you shop?<select id="trip"><option value="1">Every day</option><option value="2">Every 2 days</option><option value="3">Every 3 days</option><option value="7">Once a week (meal prep)</option></select></label><span class="note">Your budget below is for one shopping trip, spread across all the meals in it, with a different recipe each day.</span></div>
-<div class="row" style="margin-top:10px"><label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label></div>
-<div class="row" style="margin-top:10px"><label>Beverage with meals<select id="bev"><option value="">None</option><option value="water">Water</option><option value="tea">Unsweetened tea</option><option value="coffee">Black coffee</option><option value="milk">Milk (2%)</option><option value="sparkling">Sparkling water</option><option value="soda">Healthy soda (low sugar)</option><option value="wine">Wine (21+)</option></select></label><span class="note" id="bevnote"></span></div>
-<div class="row" style="margin-top:10px"><span class="meta">Shop at:</span><span id="stores" class="row"></span></div>
-<div class="row" style="margin-top:14px"><button class="btn" style="width:100%;padding:12px;font-size:15px;font-weight:600;background:var(--ac);color:#fff;border-color:var(--ac);text-align:center" onclick="go('plan')">View Your Meal Plan →</button></div>
+<div class="card pg" data-p="profile">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+    <h2 style="margin:0" id="profileHeading">Hello, <span id="helloName">there</span>! 👋</h2>
+    <span id="profileBadge" style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:8px;background:var(--ac2);color:var(--ac)">PROFILE</span>
+  </div>
+  <p class="sub" id="profileSub">Complete your profile to generate your customized calories, macros, and grocery plan.</p>
+
+  <div style="margin-bottom:12px">
+    <label style="font-size:13px;font-weight:600;color:var(--tx)">Your Name
+      <input id="uname" type="text" placeholder="e.g. Alex" maxlength="32" autocomplete="name" style="margin-top:2px">
+    </label>
+  </div>
+
+  <div class="grid">
+    <label>Sex<select id="sex"><option value="" disabled selected>Select sex</option><option value="m">Male</option><option value="f">Female</option></select></label>
+    <label>Age<input id="age" type="number" min="14" max="90" placeholder="e.g. 28"></label>
+    <label>Height (ft)<input id="ft" type="number" min="3" max="7" placeholder="e.g. 5"></label>
+    <label>Height (in)<input id="inch" type="number" min="0" max="11" placeholder="e.g. 9"></label>
+    <label>Weight (lb)<input id="wt" type="number" min="80" max="500" placeholder="e.g. 165"></label>
+    <label>Portions cooked<input id="pp" type="number" min="1" max="8" placeholder="1"></label>
+    <label>Activity<select id="act"><option value="" disabled selected>Select activity</option><option value="1.2">Sedentary</option><option value="1.375">Light (1–3 days)</option><option value="1.55">Moderate (3–5 days)</option><option value="1.725">Very active (6–7)</option></select></label>
+    <label>Goal<select id="goal"><option value="" disabled selected>Select goal</option><option value="lose">Lose weight</option><option value="cut">Cut (lean out)</option><option value="maintain">Maintain</option><option value="lean">Build muscle (lean bulk)</option><option value="bulk">Bulk</option></select></label>
+    <label>Body archetype<select id="arch"><option value="auto">Auto (from BMI)</option><option value="ecto">Ectomorph (lean, hard gainer)</option><option value="meso">Mesomorph (athletic)</option><option value="endo">Endomorph (gains easily)</option></select></label>
+  </div>
+
+  <div class="row" style="margin-top:14px"><span class="meta" style="font-weight:600">Meals to plan (budget splits evenly):</span><span id="meals" class="row"></span></div>
+
+  <div class="row" style="margin-top:12px"><label>How often do you shop?<select id="trip"><option value="1">Every day</option><option value="2">Every 2 days</option><option value="3">Every 3 days</option><option value="7">Once a week (meal prep)</option></select></label><span class="note">Your budget is for one shopping trip, spread across all the meals in it, with a different recipe each day.</span></div>
+
+  <div class="row" style="margin-top:10px"><label class="ck"><input type="checkbox" id="pantry"> Carry leftovers into my next shopping trip</label></div>
+
+  <div class="row" style="margin-top:12px"><label>Beverage with meals<select id="bev"><option value="">None</option><option value="water">Water</option><option value="tea">Unsweetened tea</option><option value="coffee">Black coffee</option><option value="milk">Milk (2%)</option><option value="sparkling">Sparkling water</option><option value="soda">Healthy soda (low sugar)</option><option value="wine">Wine (21+)</option></select></label><span class="note" id="bevnote"></span></div>
+
+  <div class="row" style="margin-top:12px"><span class="meta" style="font-weight:600">Shop at:</span><span id="stores" class="row"></span></div>
+
+  <div id="missingNotice" style="display:none;margin-top:14px;padding:12px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;color:var(--tx);font-size:13px">
+    <b style="color:#ef4444;display:block;margin-bottom:4px">Please complete required fields:</b>
+    <span id="missingList"></span>
+  </div>
+
+  <div class="row" style="margin-top:16px"><button class="btn btn-primary" id="btn-save-profile" style="width:100%;padding:14px;font-size:15px;text-align:center" onclick="completeProfile()">Save Profile &amp; Generate Meal Plan →</button></div>
 </div>
 
 <div id="plan"></div>
 <p class="note">Prices are built-in estimates for whole packages (a web page can’t scrape live retailer sites), so treat totals as a guide. Calorie and macro bars are per person. Pantry carry-over assumes leftovers keep, so freeze meat and use fresh items first. Nutrition uses the Mifflin-St Jeor formula and standard food data. This is general guidance, not medical advice.</p>
 </div>
-<nav class="nav"><button class="nv" data-p="profile" onclick="go('profile')"><b>👤</b>Profile</button><button class="nv" data-p="plan" onclick="go('plan')"><b>📋</b>Plan</button><button class="nv" data-p="meals" onclick="go('meals')"><b>🍳</b>Meals</button><button class="nv" data-p="shop" onclick="go('shop')"><b>🛒</b>Shop</button><button class="nv" data-p="week" onclick="go('week')"><b>📅</b>Week</button></nav>
+
+<nav class="nav">
+  <button class="nv" data-p="profile" onclick="go('profile')"><b><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></b>Profile</button>
+  <button class="nv" data-p="plan" onclick="go('plan')"><b><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 10h6M9 14h6M9 18h3M9.5 4h5v2h-5z"/></svg></b>Plan</button>
+  <button class="nv" data-p="meals" onclick="go('meals')"><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg></b>Meals</button>
+  <button class="nv" data-p="shop" onclick="go('shop')"><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l1 12.5H5L6 8Z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/></svg></b>Shop</button>
+  <button class="nv" data-p="week" onclick="go('week')"><b><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></b>Week</button>
+</nav>
+
 <script>
 function triggerHaptic(type) {
   try {
@@ -82,6 +417,22 @@ function triggerHaptic(type) {
       navigator.vibrate(10);
     }
   } catch(e) {}
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => {
+    t.classList.remove('show');
+  }, 2500);
 }
 
 const ST=["Walmart","Aldi","Kroger","Costco"],DY=[0,1,2,3,4,5,6].map(i=>["Mon","Tue","Wed","Thu","Fri","Sat","Sun"][((new Date().getDay()+6)%7+i)%7]);
@@ -124,9 +475,9 @@ coffee:[1,"cup brewed black coffee (grounds)",5,.3,0,0,.15,.13,.16,.10],
 sparkling:[1,"can sparkling water (12 oz)",0,0,0,0,.35,.30,.33,.28],
 soda:[1,"can low-sugar prebiotic soda (12 oz)",35,0,9,0,1.50,1.60,1.60,1.25],
 wine:[1,"glass dry wine (5 oz)",125,.1,4,0,2.20,1.90,2.30,1.80]};
-// Store pricing recalibrated to a July 2026 store-brand basket study (Kroger cheapest, then Walmart, then Aldi; Aldi strong on dairy; Kroger lowest on eggs, tomatoes, pasta). Costco left as estimated.
+// Store pricing recalibrated to July 2026 store-brand basket study
 (()=>{const dairy=['milk','yog','cott','ched'],krLow=['eggs','tom','pasta'];for(const k in I){const x=I[k],w=x[6];x[8]=+(w*(krLow.includes(k)?.9:.96)).toFixed(3);x[7]=+(w*(dairy.includes(k)?.88:1.07)).toFixed(3)}})();
-// [servings per package, package label]: shoppers pay for whole packages
+// [servings per package, package label]
 const PK={eggs:[12,"dozen large eggs"],oats:[13,"18 oz rolled oats"],banana:[3,"bananas (3)"],milk:[8,"half gallon 2% milk"],yog:[5,"32 oz plain Greek yogurt"],chick:[4,"1 lb chicken breast"],turk:[4,"1 lb 93% ground turkey"],tuna:[1,"can tuna (5 oz)"],bean:[3,"15 oz can black beans"],lent:[9,"1 lb dry lentils"],rice:[9,"1 lb brown rice"],bread:[10,"loaf whole wheat bread"],sweet:[2,"sweet potatoes (2)"],pasta:[8,"16 oz whole wheat pasta"],broc:[3,"12 oz frozen broccoli"],spin:[2,"10 oz frozen spinach"],mix:[3,"12 oz frozen mixed veg"],carrot:[4,"1 lb carrots"],tom:[3,"14.5 oz can diced tomatoes"],onion:[2,"onion"],pb:[14,"16 oz peanut butter"],oil:[16,"8 oz olive oil"],apple:[3,"apples (3)"],ched:[8,"8 oz cheddar block"],tort:[8,"8-ct whole wheat tortillas"],whey:[30,"2 lb whey protein"],cott:[4,"16 oz cottage cheese"],berry:[3,"12 oz frozen berries"],salmon:[4,"1 lb salmon fillets"],avocado:[4,"avocados (2)"],almond:[8,"8 oz almonds"],quinoa:[8,"12 oz quinoa"],tea:[20,"20-ct tea bags"],coffee:[30,"12 oz ground coffee"],sparkling:[12,"12-pack sparkling water"],soda:[12,"12-pack prebiotic soda"],wine:[5,"750 ml bottle dry wine"]};
 const pkP=(k,i)=>Math.round(I[k][6+i]*PK[k][0]*100)/100;
 const NP=()=>Math.max(1,Math.round(S.p.pp)||1);
@@ -173,69 +524,28 @@ const STEPS={
 'Rice, Beans & Egg':[45,RICE+"|Warm the beans with a pinch of salt.|Fry the eggs 3 to 4 minutes.|Serve the beans over the rice and top with the eggs."],
 'Baked Salmon, Sweet Potato & Greens':[35,"Heat the oven to 400°F and roast cubed sweet potato 10 minutes.|Add the seasoned salmon and bake 12 to 15 minutes until it reaches 145°F.|Wilt the spinach in the oil 2 minutes and serve."],
 'Turkey Quinoa Veggie Skillet':[30,"Cook the quinoa (15 minutes, then rest 5).|Brown the turkey 6 to 8 minutes until cooked through (165°F).|Add the vegetables and tomatoes and simmer 6 minutes.|Serve over the quinoa."]};
-// Beginner-friendly techniques, reused across recipes. [title, detail, equipment]
 const TECH={
-rice:["Cook the brown rice (start this first)","Measure the dry rice from your ingredient list and rinse it in a strainer under cold water for 30 seconds. Put it in a pot with twice as much water (1 cup rice to 2 cups water) and a pinch of salt. Bring to a boil over high heat, then turn the heat to low, put the lid on and leave it alone for 40 minutes without lifting the lid. Turn off the heat, keep the lid on 5 more minutes, then fluff with a fork. It is done when all the water is absorbed and the grains are tender.","pot with lid, strainer"],
-quinoa:["Cook the quinoa","Rinse the dry quinoa in a fine strainer for 30 seconds to remove its bitter coating. Put it in a pot with twice as much water (1 cup quinoa to 2 cups water) and a pinch of salt. Bring to a boil, turn the heat to low, cover and cook 15 minutes, until the water is absorbed and you can see tiny curly tails. Turn off the heat, leave it covered 5 minutes, then fluff with a fork.","pot with lid, fine strainer"],
-pasta:["Boil the pasta","Fill a large pot about two-thirds full of water, add a big pinch of salt, and bring it to a rolling boil (large, constant bubbles) over high heat. Add the pasta and stir for the first minute so it does not stick. Cook 8 to 10 minutes, tasting at 8: it should be tender with a slight bite. Scoop out 1/2 cup of the cooking water, then carefully drain the pasta in a colander in the sink (the steam is hot).","large pot, colander"],
-lentils:["Cook the lentils","Rinse the dry lentils in a strainer and pick out any small stones. Put them in a pot with 3 times as much water (1 cup lentils to 3 cups water) and bring to a boil. Lower to a gentle simmer, partly cover, and cook 20 minutes, until soft but still holding their shape. Drain any extra water.","pot, strainer"],
-chicken:["Cook the chicken","Wash your hands, then pat the chicken dry with a paper towel so it browns instead of steaming. Cut it into strips or bite-size pieces if you like, and season both sides with salt, pepper and any spices you have (garlic powder or paprika work well). Heat a nonstick pan over medium-high heat for 2 minutes, adding the olive oil from your list if there is one. Lay the chicken in a single layer without crowding and cook 5 to 6 minutes per side, until golden. Check the thickest piece with a food thermometer: it must read 165°F and be white inside with no pink. Rest it 3 minutes. Wash your hands, the knife and the cutting board with hot soapy water afterward.","nonstick pan, food thermometer, knife and cutting board"],
-turkey:["Brown the ground turkey","Heat a large pan over medium-high heat for 2 minutes. Add the turkey and break it into small crumbles with a spoon. Cook 7 to 8 minutes, stirring every minute or so, until no pink is left and it reads 165°F on a food thermometer. Season with salt and pepper (and chili powder if the recipe uses it). Spoon out extra liquid if it pools in the pan. Wash your hands after touching raw meat.","large pan, spoon, food thermometer"],
-veg:["Steam the frozen vegetables","Put the frozen vegetables in a microwave-safe bowl with 2 tablespoons of water and cover with a plate. Microwave 3 to 4 minutes, stir, and check that they are hot and tender (add 1 more minute if needed). No microwave? Put them in a pan with 2 tablespoons of water, cover, and cook over medium heat 5 minutes. Drain off any water and add a pinch of salt.","microwave-safe bowl and plate"],
-spinach:["Wilt the spinach","Thaw the frozen spinach in the microwave for 1 minute, then squeeze out as much water as you can with your hands or a clean towel. Heat the oil from your list (if any) in a pan over medium heat, add the spinach and stir 2 minutes until hot. Season with salt and pepper.","pan"],
-sweet:["Roast the sweet potato","Heat the oven to 425°F. Scrub the sweet potato under running water and cut it into cubes about 3/4 inch wide (smaller cubes cook faster). Toss them on a baking sheet with the oil from your list and a pinch of salt, and spread into one layer so the pieces do not touch. Roast 25 minutes, flipping them halfway, until a fork slides in easily and the edges are browned.","oven, baking sheet, knife and cutting board"],
-scramble:["Scramble the eggs","Crack the eggs into a bowl and beat with a fork for 30 seconds with a pinch of salt. Heat a nonstick pan over medium-low heat for 1 minute with a little oil or butter if you have it. Pour in the eggs, wait 20 seconds, then gently push them across the pan with a spatula. Keep folding for 2 to 3 minutes. Take the pan off the heat while the eggs still look slightly shiny, because they keep cooking on their own. They are done when no runny liquid is left.","nonstick pan, spatula, bowl and fork"],
-fry:["Fry the eggs","Heat a nonstick pan over medium-low heat for 1 minute with a little oil. Crack each egg into a small bowl first, then slide it into the pan so no shell gets in. Cook 2 to 3 minutes until the whites are completely white and firm. For a firmer yolk, flip the egg gently and cook 30 more seconds, or cover the pan for 1 minute.","nonstick pan, spatula"],
-toast:["Toast the bread","Put the bread in a toaster on a medium setting for 2 to 3 minutes until golden. No toaster? Toast it in a dry pan over medium heat, about 2 minutes per side.","toaster or pan"],
-beans:["Prepare the beans","Open the can, pour the beans into a strainer and rinse under cold water for 30 seconds to wash off the salty liquid. Warm them in a small pot over medium heat with a splash of water, stirring now and then for 3 to 4 minutes until hot. Season with a pinch of salt and pepper.","can opener, strainer, small pot"],
-tuna:["Drain and flake the tuna","Open the can and press the lid down against the tuna while you tip the can over the sink to drain the liquid. Break the tuna into flakes with a fork.","can opener, fork"],
-tort:["Warm the tortillas","Heat a dry pan over medium heat and warm each tortilla 20 to 30 seconds per side until soft. Or wrap them in a damp paper towel and microwave 20 seconds. Warm tortillas bend without tearing.","pan or microwave"],
-salmonsear:["Pan-sear the salmon","Pat the salmon dry with a paper towel and season both sides with salt and pepper. Heat the oil from your list in a nonstick pan over medium-high heat until it shimmers. Lay the salmon in the pan and cook 4 minutes without moving it, then flip and cook 3 to 4 more minutes. It is done at 145°F or when it flakes easily with a fork. Wash your hands after handling raw fish.","nonstick pan, food thermometer"],
-salmonbake:["Bake the salmon","Pat the salmon dry, rub it with a little of the oil and season with salt and pepper. Place it on the baking sheet next to the sweet potato and bake at 400°F for 12 to 15 minutes. It is done at 145°F or when it flakes easily with a fork. Wash your hands after handling raw fish.","oven, baking sheet, food thermometer"],
-onion:["Chop the onion","Cut off both ends, peel off the papery skin, and cut the onion in half from top to bottom. Lay a half flat-side down and slice it into thin strips, then turn it and cut across to make small pieces. Chilling the onion for 10 minutes first helps reduce tears.","knife and cutting board"]};
+rice:["Cook the brown rice (start this first)","Measure the dry rice from your ingredient list and rinse it in a strainer under cold water for 30 seconds. Put it in a pot with twice as much water (1 cup rice to 2 cups water) and a pinch of salt. Bring to a boil over high heat, then turn the heat to low, put the lid on and leave it alone for 40 minutes without lifting the lid. Turn off the heat, keep the lid on 5 more minutes, then fluff with a fork.","pot with lid, strainer"],
+quinoa:["Cook the quinoa","Rinse the dry quinoa in a fine strainer for 30 seconds to remove its bitter coating. Put it in a pot with twice as much water (1 cup quinoa to 2 cups water) and a pinch of salt. Bring to a boil, turn the heat to low, cover and cook 15 minutes, until the water is absorbed and you can see tiny curly tails. Fluff with a fork.","pot with lid, fine strainer"],
+pasta:["Boil the pasta","Fill a large pot about two-thirds full of water, add a big pinch of salt, and bring it to a rolling boil over high heat. Add the pasta and cook 8 to 10 minutes. Carefully drain the pasta in a colander in the sink.","large pot, colander"],
+lentils:["Cook the lentils","Rinse the dry lentils in a strainer. Put them in a pot with 3 times as much water (1 cup lentils to 3 cups water) and bring to a boil. Lower to a gentle simmer, partly cover, and cook 20 minutes, until soft. Drain any extra water.","pot, strainer"],
+chicken:["Cook the chicken","Pat the chicken dry with a paper towel and season both sides with salt, pepper, and garlic powder. Heat a pan over medium-high heat with olive oil. Cook 5 to 6 minutes per side until golden and internal temperature reads 165°F. Rest 3 minutes.","pan, food thermometer"],
+turkey:["Brown the ground turkey","Heat a large pan over medium-high heat. Add the turkey and break it into small crumbles. Cook 7 to 8 minutes until no pink is left (165°F). Season with salt and pepper.","large pan, spoon"],
+veg:["Steam the frozen vegetables","Put the frozen vegetables in a microwave-safe bowl with 2 tablespoons of water and cover with a plate. Microwave 3 to 4 minutes until hot and tender. Drain off water and add salt.","microwave-safe bowl and plate"],
+spinach:["Wilt the spinach","Thaw the frozen spinach in the microwave for 1 minute, squeeze out water with a clean towel. Heat oil in a pan, add spinach and stir 2 minutes until hot.","pan"],
+sweet:["Roast the sweet potato","Heat the oven to 425°F. Scrub the sweet potato and cut it into 3/4 inch cubes. Toss on a baking sheet with olive oil and salt. Roast 25 minutes, flipping halfway, until fork-tender.","oven, baking sheet"],
+scramble:["Scramble the eggs","Crack eggs into a bowl, beat with a fork and a pinch of salt. Heat a nonstick pan over medium-low heat with a little oil. Pour in eggs, gently fold with a spatula for 2 to 3 minutes until just set.","nonstick pan, spatula"],
+fry:["Fry the eggs","Heat a nonstick pan over medium-low heat with oil. Crack eggs into the pan and cook 2 to 3 minutes until whites are completely firm. Flip gently or cover 1 minute for a firmer yolk.","nonstick pan, spatula"],
+toast:["Toast the bread","Toast in a toaster 2 to 3 minutes until golden, or toast in a dry pan over medium heat 2 minutes per side.","toaster or pan"],
+beans:["Prepare the beans","Open the can, rinse beans under cold water for 30 seconds. Warm in a small pot with a splash of water for 3 to 4 minutes until hot. Season with salt and pepper.","can opener, strainer, small pot"],
+tuna:["Drain and flake the tuna","Open the can and drain the liquid. Flake the tuna with a fork.","can opener, fork"],
+tort:["Warm the tortillas","Warm each tortilla in a dry pan 20 to 30 seconds per side until soft and pliable.","pan"],
+salmonsear:["Pan-sear the salmon","Pat salmon dry, season with salt and pepper. Sear in olive oil over medium-high heat 4 minutes per side until it reaches 145°F and flakes easily.","pan, food thermometer"],
+salmonbake:["Bake the salmon","Pat salmon dry, rub with olive oil, salt and pepper. Bake at 400°F for 12 to 15 minutes until it reaches 145°F.","oven, baking sheet"],
+onion:["Chop the onion","Peel and cut onion into small dice.","knife and cutting board"]};
 const li=s=>{if(s[0]==='@'){const t=TECH[s.slice(1)];return`<li><b>${t[0]}.</b> ${t[1]}</li>`}const i=s.indexOf(': ');return i>0&&i<45?`<li><b>${s.slice(0,i)}.</b> ${s.slice(i+2)}</li>`:`<li>${s}</li>`};
 function stepsHTML(n){const z=STEPS[n],a=z[1].split('|'),eq=[...new Set(a.filter(s=>s[0]==='@').flatMap(s=>TECH[s.slice(1)][2].split(', ')))];
-return`<div class="tag" style="margin-top:8px">How to cook · about ${z[0]} min</div><div class="meta">Before you start: wash your hands, read every step once, and measure out your ingredients (amounts are listed above).${eq.length?'<br>You will need: '+eq.join(', ')+'.':''}</div><ol>${a.map(li).join('')}</ol>`}
-Object.assign(STEPS,{
-'PB Banana Oatmeal':[8,"Heat the milk: Pour the milk into a small pot and warm over medium heat 2 minutes, until small bubbles form at the edges. Do not let it boil over.|Cook the oats: Stir in the oats, lower the heat, and cook 3 to 4 minutes, stirring often, until thick and creamy.|Add toppings: Pour into a bowl, slice the banana on top, and stir in the peanut butter."],
-'Veggie Egg Scramble & Toast':[12,"@toast|Warm the spinach: Microwave the frozen spinach 1 minute, squeeze out the water, then cook it in a nonstick pan over medium heat for 1 minute.|@scramble|Finish: Sprinkle the cheese over the eggs for the last 30 seconds so it melts, then serve with the toast."],
-'Berry Yogurt Oat Bowl':[7,"Thaw the berries: Leave them in a bowl on the counter 10 minutes, or microwave 30 seconds.|Mix the base: Spoon the yogurt into a bowl and stir in the oats.|Top and wait: Add the berries and let it sit 5 minutes so the oats soften."],
-'Egg & Bean Breakfast Burrito':[15,"@beans|Mash the beans: Mash about half of them with a fork so the burrito holds together.|@scramble|@tort|Assemble: Lay a tortilla flat, put the eggs, beans and cheese in the middle, fold the sides in, then roll up from the bottom."],
-'Banana Oat Pancakes':[20,"Blend the batter: Blend the oats, eggs and banana 30 seconds until smooth. No blender? Mash the banana very well and whisk it with the eggs and oats.|Heat the pan: Warm a nonstick pan over medium heat for 2 minutes and lightly grease it.|Cook: Pour small pancakes about 3 inches wide. Cook 2 minutes, until bubbles form on top and the edges look set, then flip and cook 1 to 2 minutes more until golden.|Serve: Stack and eat warm."],
-'Cottage Cheese Toast & Apple':[7,"@toast|Add the topping: Spread the cottage cheese on the toast.|Slice the apple: Cut it in half, scoop out the core with a spoon, and slice into wedges to serve alongside."],
-'Sweet Potato Egg Hash':[25,"@onion|Prep the sweet potato: Scrub it and cut it into small 1/2 inch cubes so they cook quickly.|Cook the hash: Heat the oil in a large nonstick pan over medium heat. Add the sweet potato and onion with a pinch of salt and pepper, cover, and cook 10 to 12 minutes, stirring every 3 minutes, until a fork slides in easily.|Add the eggs: Make small wells in the hash with a spoon and crack an egg into each. Cover and cook 3 to 4 minutes until the whites are firm."],
-'Overnight Berry Oats':[5,"Mix: Put the oats, milk, yogurt and berries in a jar or container with a lid and stir well.|Chill: Cover and refrigerate at least 4 hours or overnight (up to 3 days).|Serve: Stir and eat cold, or microwave 1 minute for a warm bowl."],
-'Banana Oatmeal':[8,"Boil the water: Bring 1 cup of water for every 1/2 cup of oats to a boil in a small pot.|Cook: Stir in the oats, lower the heat to medium-low, and cook 4 minutes, stirring often, until thick.|Top: Slice the banana over the top."],
-'Egg & Toast':[10,"@toast|@scramble|Serve: Put the eggs on or beside the toast."],
-'Avocado Egg Toast':[12,"@toast|Mash the avocado: Cut it in half around the pit, twist the halves apart, scoop out the flesh with a spoon and mash with a fork and a pinch of salt.|@fry|Assemble: Spread the avocado on the toast and place the eggs on top."],
-'Almond Berry Yogurt Bowl':[7,"Prep: Roughly chop the almonds. Thaw the berries 10 minutes or microwave 30 seconds.|Build: Spoon the yogurt into a bowl, then add the berries, oats and almonds.|Wait: Let it sit 5 minutes so the oats soften."],
-'Tuna Rice Bowl':[45,"@rice|@veg|@tuna|Assemble: Put the rice in a bowl, add the broccoli and tuna, and drizzle with the olive oil."],
-'Chicken & Sweet Potato Plate':[40,"@sweet|Timing: Put the chicken in the pan about 10 minutes after the sweet potato goes in the oven, so both finish together.|@chicken|@veg|Plate: Put the chicken, sweet potato and broccoli on a plate."],
-'Lentil Veggie Stew':[40,"@onion|Soften the onion: Heat the oil in a large pot over medium heat. Add the onion and cook 4 minutes, stirring, until soft and clear.|Prep the carrots: Wash and peel them with a vegetable peeler, then cut into coins about 1/4 inch thick.|Add everything: Rinse the lentils, then add the lentils, carrots, tomatoes (with juice), a pinch of salt and 2 cups of water for every 1 cup of dry lentils.|Simmer: Bring to a boil, lower the heat, cover, and cook 25 minutes, stirring now and then, until the lentils are soft. Add a splash of water if it gets too thick. Taste and add salt and pepper."],
-'Turkey Burrito Bowl':[45,"@rice|@turkey|@beans|Warm the tomatoes: Pour them into a small pot and heat 3 minutes.|Build the bowl: Spoon the rice into a bowl and top with the turkey, beans and tomatoes."],
-'Chicken Burrito Bowl':[45,"@rice|@chicken|@beans|Warm the tomatoes: Pour them into a small pot and heat 3 minutes.|Build the bowl: Spoon the rice into a bowl and top with the sliced chicken, beans and tomatoes."],
-'Tuna Pasta Salad':[20,"@pasta|Cool the pasta: Rinse it under cold water for 30 seconds so it stops cooking.|Prep the carrots: Wash and peel them, then shred on a box grater or cut into thin sticks.|@tuna|Mix: Toss the pasta, tuna and carrots in a bowl with the olive oil, salt and pepper. Eat right away or chill 30 minutes."],
-'Turkey Veggie Wrap':[25,"@turkey|@veg|@tort|Assemble: Spoon the turkey, vegetables and cheese in a line down the center of a tortilla. Fold in the two sides, then roll up from the bottom like a burrito."],
-'Egg Fried Rice':[45,"@rice|Tip: Rice that was cooked a day ahead and chilled fries best. If yours is fresh, spread it on a plate for 10 minutes to cool and dry.|@veg|@scramble|Fry it together: Heat the oil in a large pan over medium-high heat. Add the rice and vegetables and stir 4 to 5 minutes until steaming hot, then fold in the eggs. Season with salt, pepper and soy sauce if you have it."],
-'Rice & Beans':[45,"@rice|@beans|Add the tomatoes: Stir the tomatoes (with juice) into the beans and simmer 10 minutes over medium-low heat with chili powder and salt, until slightly thickened.|Serve: Spoon the beans over the rice."],
-'Lentils & Rice':[45,"@rice|@lentils|Serve: Spoon the lentils over the rice and season with salt, pepper and a squeeze of lemon if you have it."],
-'Simple Tuna Rice':[45,"@rice|@tuna|Serve: Fluff the hot rice, top with the tuna and season with black pepper and lemon if you have it."],
-'Salmon Quinoa Bowl':[30,"@quinoa|@salmonsear|@veg|Assemble: Spoon the quinoa into a bowl, add the broccoli, flake the salmon on top and drizzle with the remaining oil."],
-'Chicken Avocado Quinoa Bowl':[35,"@quinoa|@chicken|@beans|Slice the avocado: Cut it in half around the pit, twist the halves apart, remove the pit with a spoon, scoop out the flesh and slice it.|Build the bowl: Quinoa first, then sliced chicken, beans and avocado."],
-'Chicken Veggie Pasta':[30,"@pasta|@chicken|@veg|Make the sauce: Add the vegetables and tomatoes (with juice) to the chicken pan and simmer 4 minutes over medium heat.|Combine: Add the drained pasta to the pan and toss 1 minute. Splash in a little saved pasta water if it looks dry."],
-'Turkey Bean Chili':[40,"@onion|@turkey|Add the onion: Stir the chopped onion into the turkey for the last 4 minutes of browning.|@beans|Build the chili: Add the beans, tomatoes (with juice), 1 to 2 teaspoons of chili powder per serving, salt and 1 cup of water to the pot.|Simmer: Bring to a boil, lower the heat, and cook uncovered 20 minutes, stirring occasionally, until thick. Taste and adjust the salt."],
-'Chicken Veggie Stir-Fry':[50,"@rice|@chicken|@veg|Combine: Add the vegetables to the chicken pan with a splash of soy sauce if you have it and stir 2 minutes until hot.|Serve: Spoon over the rice."],
-'Lentil Spinach Rice Bowl':[50,"@rice|@lentils|@spinach|@fry|Build the bowl: Rice first, then lentils, then spinach, topped with the fried eggs."],
-'Baked Chicken, Sweet Potato & Greens':[40,"Roast the sweet potato: Heat the oven to 425°F. Cube the sweet potato, toss with half the oil and a pinch of salt on a baking sheet, and roast 10 minutes.|Add the chicken: Wash your hands, pat the chicken dry, season with salt and pepper and nestle it on the same sheet. Bake 15 to 20 minutes more, until the thickest part reads 165°F. Wash your hands, knife and board afterward.|@spinach|Plate: Serve the chicken with the sweet potato and spinach."],
-'Turkey Meat Sauce Spaghetti':[35,"@onion|@turkey|Add the onion: Stir the chopped onion into the turkey for the last 4 minutes of browning.|Make the sauce: Add the tomatoes (with juice) and a pinch of salt. Simmer on medium-low 12 minutes, stirring now and then.|@pasta|Serve: Spoon the sauce over the pasta."],
-'Lentil Curry Bowl':[50,"@rice|@onion|Cook the curry base: Heat the oil in a large pot over medium heat, cook the onion 4 minutes, then stir in 1 to 2 teaspoons of curry powder per serving for 30 seconds until fragrant.|Add the lentils: Rinse the lentils and add them with the tomatoes (with juice), salt and 2 cups of water for every 1 cup of dry lentils. Bring to a boil, then simmer covered 25 minutes until soft.|Add the greens: Stir in the spinach (thawed and squeezed dry) and cook 2 minutes.|Serve: Spoon over the rice."],
-'Black Bean Sweet Potato Bowl':[40,"@sweet|@beans|@spinach|Assemble: Put the sweet potato in a bowl, add the beans and spinach, and sprinkle the cheese on top while everything is hot so it melts."],
-'Chicken & Broccoli Rice':[50,"@rice|@chicken|@veg|Combine: Toss the broccoli with the chicken in the pan for 1 minute and spoon over the rice."],
-'Bean & Tomato Pasta':[25,"@pasta|@beans|Make the sauce: Add the tomatoes (with juice) to the beans and simmer 10 minutes over medium-low heat. Season with salt, pepper and Italian herbs if you have them.|Combine: Toss the sauce with the drained pasta."],
-'Lentil Tomato Pasta':[35,"@lentils|@pasta|Make the sauce: Return the lentils to their pot, add the tomatoes (with juice) and simmer 5 minutes. Season with salt and pepper.|Combine: Toss the sauce with the pasta."],
-'Rice, Beans & Egg':[50,"@rice|@beans|@fry|Serve: Put the rice in a bowl, add the beans and top with the fried eggs."],
-'Baked Salmon, Sweet Potato & Greens':[40,"Roast the sweet potato: Heat the oven to 400°F. Cube the sweet potato, toss with half the oil and a pinch of salt on a baking sheet, and roast 10 minutes.|@salmonbake|@spinach|Plate: Serve the salmon with the sweet potato and spinach."],
-'Turkey Quinoa Veggie Skillet':[35,"@quinoa|@turkey|@veg|Simmer: Add the vegetables and tomatoes (with juice) to the turkey pan and simmer 6 minutes.|Serve: Spoon over the quinoa."]});
+return`<div class="tag" style="margin-top:8px">How to cook · about ${z[0]} min</div><div class="meta">Before you start: wash your hands, read every step once, and measure out your ingredients.${eq.length?'<br>You will need: '+eq.join(', ')+'.':''}</div><ol>${a.map(li).join('')}</ol>`}
 const R=[
 {s:'b',n:'PB Banana Oatmeal',i:{oats:1,banana:1,milk:1,pb:1},t:'Simmer oats in the milk for 3–4 minutes, then top with sliced banana and peanut butter.'},
 {s:'b',n:'Veggie Egg Scramble & Toast',i:{eggs:3,spin:1,bread:1,ched:.5},t:'Scramble eggs with spinach in a nonstick pan, finish with cheese and serve with toast.'},
@@ -289,14 +599,63 @@ const G={lose:[-500,1],cut:[-750,1.1],maintain:[0,.8],lean:[250,1],bulk:[500,1]}
 const SL=[['b','Breakfast',.25],['l','Lunch',.3],['d','Dinner',.35],['s','Snack',.1]];
 const NOTE={ecto:'Ectomorph: fast metabolism, so your plan adds calories and leans on carbs. Prioritize heavy compound lifts and don’t skip meals.',meso:'Mesomorph: you respond well to both training and diet, so a balanced split of protein, carbs and fats works best.',endo:'Endomorph: you store energy easily, so your plan trims carbs a little, raises fats and favors high-fiber foods plus regular activity.'};
 const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),money=x=>'$'+x.toFixed(2),fmt=x=>+x.toFixed(2);
-let S={p:{sex:'',age:'',ft:'',inch:'',wt:'',pp:'',act:'',goal:'',arch:'auto'},bud:[10,10,10,10,10,10,10],day:0,tb:10,st:[0,0,0,0],meals:[]};
+let S={p:{name:'',sex:'',age:'',ft:'',inch:'',wt:'',pp:'1',act:'',goal:'',arch:'auto'},bud:[10,10,10,10,10,10,10],day:0,tb:10,st:[0,0,0,0],meals:[]};
 try{const x=JSON.parse(localStorage.getItem('bb1')||'null');if(x&&x.p&&x.bud&&x.bud.length===7)S=x}catch(e){}
+if(!S.p)S.p={name:'',sex:'',age:'',ft:'',inch:'',wt:'',pp:'1',act:'',goal:'',arch:'auto'};
+if(S.p.name===undefined)S.p.name='';
 if(!S.meals)S.meals=[];
 if(!S.st)S.st=[0,0,0,0];
 if(S.bev===undefined)S.bev='';if(S.pantry===undefined)S.pantry=false;if(!S.trip)S.trip=1;if(!S.tb)S.tb=((S.bud&&S.bud[0])||10)*S.trip;
 const save=()=>{try{localStorage.setItem('bb1',JSON.stringify(S))}catch(e){}};
 let PC={},LC={};
-function isReady(){const p=S.p;return !!(p.wt&&p.ft&&p.age&&p.sex&&p.act&&p.goal&&S.meals.length&&S.st.some(x=>x))}
+function isReady(){const p=S.p;return !!(p&&p.name&&p.name.trim()&&p.wt&&p.ft&&p.age&&p.sex&&p.act&&p.goal&&S.meals.length&&S.st.some(x=>x))}
+function updateGreeting(){
+  const name=(S.p.name||'').trim();
+  const el=$('helloName');
+  if(el) el.textContent=name||'there';
+  const rdy=isReady();
+  const badge=$('profileBadge');
+  if(badge){
+    badge.textContent=rdy?'READY':'SETUP REQUIRED';
+    badge.style.background=rdy?'var(--ac2)':'rgba(239,68,68,0.15)';
+    badge.style.color=rdy?'var(--ac)':'#ef4444';
+  }
+  const sub=$('profileSub');
+  if(sub) sub.textContent=rdy?'Your personalized body stats, nutrition targets, and shopping settings.':'Complete your profile to generate your customized calories, macros, and grocery plan.';
+  const btn=$('btn-save-profile');
+  if(btn) btn.textContent=rdy?'Update Profile & View Plan →':'Save Profile & Generate Meal Plan →';
+  const notice=$('missingNotice');
+  if(notice && rdy) notice.style.display='none';
+}
+function completeProfile(){
+  const p=S.p,hasStores=S.st&&S.st.some(x=>x),hasMeals=S.meals&&S.meals.length>0;
+  const missing=[];
+  if(!p.name||!p.name.trim())missing.push("Your Name");
+  if(!p.sex)missing.push("Sex");
+  if(!p.age)missing.push("Age");
+  if(!p.ft)missing.push("Height (ft)");
+  if(!p.wt)missing.push("Weight (lb)");
+  if(!p.act)missing.push("Activity level");
+  if(!p.goal)missing.push("Goal");
+  if(!hasMeals)missing.push("At least one Meal to plan");
+  if(!hasStores)missing.push("At least one Store to shop at");
+  const notice=$('missingNotice');
+  if(missing.length>0){
+    triggerHaptic('warning');
+    if(notice){
+      notice.style.display='block';
+      $('missingList').textContent=missing.join(', ');
+      notice.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    showToast("Please fill in: "+missing[0]);
+    return;
+  }
+  if(notice) notice.style.display='none';
+  triggerHaptic('success');
+  save();
+  showToast("Profile ready! Loading plan...");
+  go('plan');
+}
 function calc(){const p=S.p;
 if(!p.wt||!p.ft||!p.age||!p.sex||!p.act||!p.goal||!G[p.goal])return{ready:false,bmi:0,arch:'meso',tdee:0,cal:0,pro:0,fat:0,carb:0};
 const wt=+p.wt,kg=wt*.4536,cm=((+p.ft||5)*12+(+p.inch||0))*2.54,bmi=kg/((cm/100)**2);
@@ -325,13 +684,15 @@ const m=r.c.map((x,i)=>({...x,m:r.share[i],slot:sel[i][1],sb}));
 const tot={c:0,p:0,cb:0,f:0,m:r.cost};m.forEach(x=>{tot.c+=x.c;tot.p+=x.p;tot.cb+=x.cb;tot.f+=x.f});
 const ns={},used={};for(const k in r.agg){const have=stock[k]||0;used[k]=Math.min(have,r.agg[k]);ns[k]=have+r.packs[k]*PK[k][0]-r.agg[k]}for(const k in stock)if(!(k in ns))ns[k]=stock[k];for(const k in ns)if(ns[k]<1e-6)delete ns[k];
 return{pick:{m,tot},over,agg:r.agg,packs:r.packs,stock:ns,used}}
-const bar=(l,v,t,u)=>`<div class="meta">${l}: <b>${Math.round(v)}</b> / ${t} ${u}</div><div class="bar"><i style="width:${clamp(v/t*100,0,100)}%"></i></div>`;
+const RC={Calories:['#34c759','#7be495'],Protein:['#0a84ff','#64d2ff'],Carbs:['#ff9f0a','#ffd60a'],Fat:['#ff375f','#ff8fa3'],Spend:['#30b0c7','#5ac8fa']};
+const bar=(l,v,t,u)=>{const p=clamp(v/t,0,1),c=RC[l]||RC.Calories,over=l==='Spend'&&v>t+.005,pre=u==='$'?'$':'';return`<div class="rg"><div class="rw"><svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="rg${l}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${over?'#ff453a':c[0]}"/><stop offset="1" stop-color="${over?'#ff9f0a':c[1]}"/></linearGradient></defs><circle class="rt" cx="50" cy="50" r="40"/><circle class="rc" cx="50" cy="50" r="40" stroke="url(#rg${l})" style="stroke-dasharray:251.3;stroke-dashoffset:${(251.3*(1-p)).toFixed(1)}" transform="rotate(-90 50 50)"/></svg><div class="rv"><b>${pre}${Math.round(v)}</b><span>/ ${pre}${Math.round(t)}</span></div></div><div class="rl">${l}${u==='kcal'?' · kcal':u==='g'?' · g':''}${over?' · over':''}</div></div>`};
 function render(){
+updateGreeting();
 const t=calc(),hasStores=S.st&&S.st.some(x=>x),hasMeals=S.meals&&S.meals.length>0;
 if(!t.ready||!hasStores||!hasMeals){
 const missing=[];
-if(!S.p.sex)missing.push("Sex");if(!S.p.age)missing.push("Age");if(!S.p.ft)missing.push("Height");if(!S.p.wt)missing.push("Weight");if(!S.p.act)missing.push("Activity level");if(!S.p.goal)missing.push("Goal");if(!hasMeals)missing.push("Meals to plan");if(!hasStores)missing.push("Stores to shop at");
-let h=`<div class="card pg" data-p="plan meals shop week"><div style="text-align:center;padding:24px 8px"><div style="font-size:46px;margin-bottom:8px">🥗</div><h2 style="font-size:20px;margin:0 0 6px">Welcome to BudgetBites!</h2><p class="sub" style="margin:0 auto 16px;max-width:380px">Fill in your profile details to generate your customized calorie targets, meals, and grocery plan.</p><div style="background:var(--ac2);border-radius:12px;padding:12px 14px;margin:0 auto 16px;max-width:380px;text-align:left"><span style="font-size:12px;font-weight:600;color:var(--ac);display:block;margin-bottom:6px">PLEASE COMPLETE IN PROFILE:</span><span style="font-size:13px;color:var(--tx)">${missing.join(' · ')}</span></div><button class="btn" onclick="go('profile')" style="width:100%;max-width:320px;padding:12px;font-size:15px;font-weight:600;background:var(--ac);color:#fff;border-color:var(--ac)">Fill in Your Profile →</button></div></div>`;
+if(!S.p.name)missing.push("Your Name");if(!S.p.sex)missing.push("Sex");if(!S.p.age)missing.push("Age");if(!S.p.ft)missing.push("Height");if(!S.p.wt)missing.push("Weight");if(!S.p.act)missing.push("Activity level");if(!S.p.goal)missing.push("Goal");if(!hasMeals)missing.push("Meals to plan");if(!hasStores)missing.push("Stores to shop at");
+let h=`<div class="card pg" data-p="plan meals shop week"><div style="text-align:center;padding:24px 8px"><div style="font-size:46px;margin-bottom:8px">🥗</div><h2 style="font-size:20px;margin:0 0 6px">Welcome to BudgetBites!</h2><p class="sub" style="margin:0 auto 16px;max-width:380px">Fill in your profile details to generate your customized calorie targets, meals, and grocery plan.</p><div style="background:var(--ac2);border-radius:14px;padding:12px 14px;margin:0 auto 16px;max-width:380px;text-align:left"><span style="font-size:12px;font-weight:600;color:var(--ac);display:block;margin-bottom:6px">PLEASE COMPLETE IN PROFILE:</span><span style="font-size:13px;color:var(--tx)">${missing.join(' · ')}</span></div><button class="btn btn-primary" onclick="go('profile')" style="width:100%;max-width:320px;padding:12px;font-size:15px;margin:0 auto;display:block">Go to Profile Setup →</button></div></div>`;
 $('plan').innerHTML=h;show();return}
 PC={};LC={};for(const k in I){const a=S.st.map((on,i)=>on?pkP(k,i):Infinity),m=Math.min(...a);PC[k]={p:m,s:a.indexOf(m)}}
 const L=S.trip||1;let stock={};const RS=[];
@@ -362,7 +723,7 @@ let h=`<div class="card pg" data-p="plan"><h2>Your plan</h2><div class="grid">
 <div class="row" style="margin-top:8px"><label>Budget per shopping trip ($) · covers ${L===1?'1 day':L+' days'}<input id="bud" type="number" min="1" step="1" value="${S.tb}" style="width:110px"></label></div></div>
 <div class="card pg" data-p="plan"><h2>${DY[S.day]}: ${money(R2.trip.cost)} at the register (${R2.trip.len>1?DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' trip, ':''}budget ${money(R2.trip.B)})</h2>${R2.trip.short?`<p class="warn">Your ${money(R2.trip.B)} budget covers ${R2.trip.len} of ${Math.min(S.trip||1,7-R2.trip.start)} days, so shop again on ${DY[R2.trip.start+R2.trip.len]||'the next trip day'} for the rest.</p>`:''}${trim<1&&!over?`<p class="warn">Recipes were scaled to about ${Math.round(trim*100)}% of your calorie target (${Math.round(t.cal*trim)} kcal) to fit this budget.</p>`:''}
 ${over?`<p class="warn">Even at 60% of your calories, this budget can’t cover whole packages at the register. The cheapest plan is ${money(R2.trip.cost)}, so raise the budget or plan fewer meals.</p>`:''}
-${bar('Calories',T.c,t.cal,'kcal')}${bar('Protein',T.p,t.pro,'g')}${bar('Carbs',T.cb,t.carb,'g')}${bar('Fat',T.f,t.fat,'g')}${bar('Spend',R2.trip.cost,R2.trip.B,'$')}</div><div class="card pg" data-p="plan"><h2>Budget breakdown</h2><table>${RS.filter(r=>r.trip===R2.trip).map(r=>`<tr><td>${DY[r.idx]}</td><td>${r.pick.m.map(x=>x.r.n).join(', ')}</td><td>${money(r.dayCost)}</td></tr>`).join('')}<tr><td colspan="2"><b>Trip total at the register</b></td><td><b>${money(R2.trip.cost)}</b></td></tr><tr><td colspan="2">Budget</td><td>${money(R2.trip.B)}</td></tr><tr><td colspan="2">${R2.trip.B>=R2.trip.cost?'Left in budget':'Over budget'}</td><td class="${R2.trip.B>=R2.trip.cost?'best':'warn'}">${money(Math.abs(R2.trip.B-R2.trip.cost))}</td></tr></table><p class="note">Each day shows its share of the packages you buy for the trip.</p></div>`;
+<div class="rings">${bar('Calories',T.c,t.cal,'kcal')}${bar('Protein',T.p,t.pro,'g')}${bar('Carbs',T.cb,t.carb,'g')}${bar('Fat',T.f,t.fat,'g')}${bar('Spend',R2.trip.cost,R2.trip.B,'$')}</div></div><div class="card pg" data-p="plan"><h2>Budget breakdown</h2><table>${RS.filter(r=>r.trip===R2.trip).map(r=>`<tr><td>${DY[r.idx]}</td><td>${r.pick.m.map(x=>x.r.n).join(', ')}</td><td>${money(r.dayCost)}</td></tr>`).join('')}<tr><td colspan="2"><b>Trip total at the register</b></td><td><b>${money(R2.trip.cost)}</b></td></tr><tr><td colspan="2">Budget</td><td>${money(R2.trip.B)}</td></tr><tr><td colspan="2">${R2.trip.B>=R2.trip.cost?'Left in budget':'Over budget'}</td><td class="${R2.trip.B>=R2.trip.cost?'best':'warn'}">${money(Math.abs(R2.trip.B-R2.trip.cost))}</td></tr></table><p class="note">Each day shows its share of the packages you buy for the trip.</p></div>`;
 pick.m.forEach((x,i)=>{h+=`<div class="card meal pg" data-p="meals"><span class="tag">${x.slot}</span><h3><span>${x.r.n}</span><span class="meta">${Math.round(x.c)} kcal · ${Math.round(x.p)}g P · ${Math.round(x.cb)}g C · ${Math.round(x.f)}g F · ${money(x.m)}</span></h3>
 <ul>${Object.keys(x.q).map(k=>`<li>${fmt(x.q[k]*I[k][0]*NP())} ${I[k][1]}</li>`).join('')}</ul>${S.bev&&(S.bev!=='wine'||x.r.s===(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?`<div class="meta">🥤 ${S.bev==='water'?'Drink: water. ':''}${BSUG[S.bev]}</div>`:''}${STEPS[x.r.n]?`${stepsHTML(x.r.n)}`:`<div class="meta">${x.r.t}</div>`}</div>`});
 h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0);return`<table><tr><th colspan="2">${ST[s]}</th></tr>${L.map(([k,q,c])=>`<tr><td>${q} × ${PK[k][1]}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table><div style="height:8px"></div>`}).join('')}
@@ -371,16 +732,47 @@ ${Object.keys(agg).some(k=>(R2.used[k]||0)>.01)?`<table><tr><th colspan="2">From
 $('plan').innerHTML=h;show();const b=$('bud');b.onchange=()=>{S.tb=Math.max(1,+b.value||10);save();render()}}
 function pickDay(i){triggerHaptic('light');S.day=i;save();render()}
 function allDays(){S.bud=S.bud.map(()=>S.bud[S.day]);save();render()}
-['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);e.value=S.p[id]!==undefined?S.p[id]:'';e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?(e.value===''?'' :+e.value):e.value;save();render()}});
+const unameEl=$('uname');
+if(unameEl){
+  unameEl.value=S.p.name||'';
+  unameEl.oninput=()=>{
+    S.p.name=unameEl.value;
+    updateGreeting();
+    save();
+  };
+}
+['sex','age','ft','inch','wt','pp','act','goal','arch'].forEach(id=>{const e=$(id);if(!e)return;e.value=S.p[id]!==undefined?S.p[id]:'';e.oninput=()=>{S.p[id]=(e.type==='number'||id==='act')?(e.value===''?'' :+e.value):e.value;updateGreeting();save();render()}});
 $('stores').innerHTML=ST.map((s,i)=>`<label class="ck"><input type="checkbox" id="st${i}"> ${s}</label>`).join('');
-ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!(S.st&&S.st[i]);e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;save();render()}});
+ST.forEach((s,i)=>{const e=$('st'+i);e.checked=!!(S.st&&S.st[i]);e.onchange=()=>{triggerHaptic('selection');S.st[i]=e.checked?1:0;updateGreeting();save();render()}});
 $('meals').innerHTML=SL.map(([s,n])=>`<label class="ck"><input type="checkbox" id="ml${s}"> ${n}</label>`).join('');
-SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));S.meals=a;save();render()}});
-const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bevnote')?$('bev').value:'';bn();save();render()};
+SL.forEach(([s])=>{const e=$('ml'+s);e.checked=S.meals.includes(s);e.onchange=()=>{triggerHaptic('selection');const a=SL.map(x=>x[0]).filter(k=>k===s?e.checked:S.meals.includes(k));S.meals=a;updateGreeting();save();render()}});
+const bn=()=>{$('bevnote').textContent=S.bev==='wine'?'21+ only. One glass per portion, added to dinner. Drink responsibly.':S.bev==='soda'?'Low-sugar prebiotic soda, about 35 kcal per can.':''};$('bev').value=S.bev;bn();$('bev').onchange=()=>{S.bev=$('bev').value;bn();save();render()};
 $('trip').value=S.trip;$('trip').onchange=()=>{const o=S.trip||1;S.trip=+$('trip').value;S.tb=Math.round(S.tb/o*S.trip);save();render()};
 $('pantry').checked=!!S.pantry;$('pantry').onchange=()=>{triggerHaptic('selection');S.pantry=$('pantry').checked;save();render()};
-let PAGE=(location.hash||'').slice(1);if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE=isReady()?'plan':'profile';
-function show(){document.querySelectorAll('.pg').forEach(e=>{e.style.display=e.dataset.p.split(' ').includes(PAGE)?'':'none'});document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===PAGE))}
-function go(p){triggerHaptic('selection');PAGE=p;try{location.hash=p}catch(e){}show();window.scrollTo(0,0)}
+let PAGE=(location.hash||'').slice(1);
+if(!['profile','plan','meals','shop','week'].includes(PAGE))PAGE=isReady()?'plan':'profile';
+if(!isReady())PAGE='profile';
+function show(){
+  document.querySelectorAll('.pg').forEach(e=>{
+    const list=e.dataset.p.split(' ');
+    e.style.display=list.includes(PAGE)?'':'none';
+  });
+  document.querySelectorAll('.nv').forEach(b=>b.classList.toggle('on',b.dataset.p===PAGE));
+}
+function go(p){
+  if(p!=='profile'&&!isReady()){
+    triggerHaptic('warning');
+    showToast("Please complete your profile first!");
+    PAGE='profile';
+    show();
+    window.scrollTo(0,0);
+    return;
+  }
+  triggerHaptic('selection');
+  PAGE=p;
+  try{location.hash=p}catch(e){}
+  show();
+  window.scrollTo(0,0);
+}
 render();
 </script></body></html>
