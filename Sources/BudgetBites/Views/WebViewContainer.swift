@@ -127,6 +127,28 @@ struct WebViewContainer: UIViewRepresentable {
                         }
                     }
 
+                    // Send current Kroger account link status
+                    let isLinked = KrogerService.shared.isAccountLinked
+                    self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: \(isLinked) });")
+
+                case "linkAccount":
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let anchor = windowScene.windows.first(where: { $0.isKeyWindow }) else {
+                        self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: false, error: 'Unable to present sign-in window' });")
+                        return
+                    }
+                    do {
+                        let _ = try await KrogerService.shared.linkAccount(presentationAnchor: anchor)
+                        self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: true, message: 'Kroger account linked successfully!' });")
+                    } catch {
+                        let errMsg = error.localizedDescription.replacingOccurrences(of: "'", with: "\\'")
+                        self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: false, error: '\(errMsg)' });")
+                    }
+
+                case "unlinkAccount":
+                    KrogerService.shared.unlinkAccount()
+                    self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: false, message: 'Kroger account unlinked' });")
+
                 case "searchStores":
                     let zipCode = dict["zipCode"] as? String
                     let useGPS = dict["useGPS"] as? Bool ?? false
@@ -178,20 +200,14 @@ struct WebViewContainer: UIViewRepresentable {
                     do {
                         let success = try await KrogerService.shared.addToCart(items: items, presentationAnchor: anchor)
                         self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: \(success), count: \(items.count) });")
+                        self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: true });")
                     } catch {
                         let errMsg = error.localizedDescription.replacingOccurrences(of: "'", with: "\\'")
                         self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: false, error: '\(errMsg)' });")
                     }
 
                 case "openCart":
-                    if let rootVC = UIApplication.shared.connectedScenes
-                        .compactMap({ $0 as? UIWindowScene })
-                        .flatMap({ $0.windows })
-                        .first(where: { $0.isKeyWindow })?.rootViewController {
-                        var topVC = rootVC
-                        while let presented = topVC.presentedViewController {
-                            topVC = presented
-                        }
+                    if let topVC = self.getTopViewController() {
                         KrogerService.shared.openKrogerCart(from: topVC)
                     }
 
@@ -199,6 +215,21 @@ struct WebViewContainer: UIViewRepresentable {
                     break
                 }
             }
+        }
+
+        @MainActor
+        private func getTopViewController() -> UIViewController? {
+            let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+            guard let window = scenes.flatMap({ $0.windows }).first(where: { $0.isKeyWindow }) ??
+                               scenes.first?.windows.first,
+                  let root = window.rootViewController else {
+                return nil
+            }
+            var top = root
+            while let presented = top.presentedViewController, !presented.isBeingDismissed {
+                top = presented
+            }
+            return top
         }
 
         private func loadPricesForStore(locationId: String) {

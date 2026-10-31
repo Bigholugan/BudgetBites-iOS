@@ -50,6 +50,26 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>BudgetBites needs your location to find nearby Kroger grocery stores and get live local prices.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.budgetbites.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>budgetbites</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kroger</string>

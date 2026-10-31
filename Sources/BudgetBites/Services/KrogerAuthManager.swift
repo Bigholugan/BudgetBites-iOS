@@ -105,9 +105,15 @@ public final class KrogerAuthManager: NSObject, ASWebAuthenticationPresentationC
             session.start()
         }
         
-        // Extract auth code from callback URL
-        guard let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true),
-              let code = components.queryItems?.first(where: { $0.name == "code" })?.value else {
+        // Extract auth code or error from callback URL
+        guard let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: true) else {
+            throw AuthError.missingAuthCode
+        }
+        if let err = components.queryItems?.first(where: { $0.name == "error" })?.value {
+            let desc = components.queryItems?.first(where: { $0.name == "error_description" })?.value ?? err
+            throw AuthError.tokenExchangeFailed(desc)
+        }
+        guard let code = components.queryItems?.first(where: { $0.name == "code" })?.value else {
             throw AuthError.missingAuthCode
         }
         

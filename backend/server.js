@@ -391,35 +391,18 @@ app.put('/api/kroger/cart', async (req, res) => {
   }
 });
 
-// 7. Universal Link Callback Handler for ASWebAuthenticationSession
+// 7. Universal Link / Custom Scheme Callback Handler for ASWebAuthenticationSession
 app.get('/callback', (req, res) => {
   const { code, state, error, error_description } = req.query;
 
   if (error) {
-    return res.status(400).send(`
-      <!DOCTYPE html>
-      <html><head><title>Authorization Failed</title></head>
-      <body style="font-family:system-ui;text-align:center;padding:40px;">
-        <h2>Authentication Failed</h2>
-        <p>${error_description || error}</p>
-        <p>You can close this window and return to BudgetBites.</p>
-      </body></html>
-    `);
+    const errUri = `budgetbites://callback?error=${encodeURIComponent(error)}&error_description=${encodeURIComponent(error_description || '')}`;
+    return res.redirect(errUri);
   }
 
-  // When ASWebAuthenticationSession intercepts this URL, it extracts the code and state
-  res.send(`
-    <!DOCTYPE html>
-    <html><head><title>BudgetBites Connected</title></head>
-    <body style="font-family:system-ui;text-align:center;padding:40px;">
-      <h2>Connecting to Kroger...</h2>
-      <p>Returning to BudgetBites.</p>
-      <script>
-        // Smoothly close browser or redirect to universal app link
-        window.location.href = "budgetbites://callback?code=${code}&state=${state}";
-      </script>
-    </body></html>
-  `);
+  // Redirect to budgetbites:// scheme which ASWebAuthenticationSession intercepts immediately
+  const successUri = `budgetbites://callback?code=${encodeURIComponent(code || '')}&state=${encodeURIComponent(state || '')}`;
+  res.redirect(successUri);
 });
 
 app.listen(PORT, () => {

@@ -648,6 +648,7 @@ td:last-child, th:last-child { text-align: right; }
         </div>
         <div id="krogerStoreResults" style="margin-top:10px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
       </div>
+      <div id="krogerStepAccountArea" style="margin-top:10px;border-top:1px solid var(--gb);padding-top:10px"></div>
     </div>
 
     <div style="background:var(--ig);border:1px solid var(--gb);border-radius:14px;padding:12px;margin-top:10px">
@@ -1082,7 +1083,7 @@ ${over?`<p class="warn">Even at 60% of your calories, this budget can’t cover 
 <div class="rings">${bar('Calories',T.c,t.cal,'kcal')}${bar('Protein',T.p,t.pro,'g')}${bar('Carbs',T.cb,t.carb,'g')}${bar('Fat',T.f,t.fat,'g')}${bar('Spend',R2.trip.cost,R2.trip.B,'$')}</div></div><div class="card pg" data-p="plan"><h2>Budget breakdown</h2><table>${RS.filter(r=>r.trip===R2.trip).map(r=>`<tr><td>${DY[r.idx]}</td><td>${r.pick.m.map(x=>x.r.n).join(', ')}</td><td>${money(r.dayCost)}</td></tr>`).join('')}<tr><td colspan="2"><b>Trip total at the register</b></td><td><b>${money(R2.trip.cost)}</b></td></tr><tr><td colspan="2">Budget</td><td>${money(R2.trip.B)}</td></tr><tr><td colspan="2">${R2.trip.B>=R2.trip.cost?'Left in budget':'Over budget'}</td><td class="${R2.trip.B>=R2.trip.cost?'best':'warn'}">${money(Math.abs(R2.trip.B-R2.trip.cost))}</td></tr></table><p class="note">Each day shows its share of the packages you buy for the trip.</p></div>`;
 pick.m.forEach((x,i)=>{h+=`<div class="card meal pg" data-p="meals"><span class="tag">${x.slot}</span><h3><span>${x.r.n}</span><span class="meta">${Math.round(x.c)} kcal · ${Math.round(x.p)}g P · ${Math.round(x.cb)}g C · ${Math.round(x.f)}g F · ${money(x.m)}</span></h3>
 <ul>${Object.keys(x.q).map(k=>`<li>${fmt(x.q[k]*I[k][0]*NP())} ${I[k][1]}</li>`).join('')}</ul>${S.bev&&(S.bev!=='wine'||x.r.s===(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?`<div class="meta">🥤 ${S.bev==='water'?'Drink: water. ':''}${BSUG[S.bev]}</div>`:''}${STEPS[x.r.n]?`${stepsHTML(x.r.n)}`:`<div class="meta">${x.r.t}</div>`}</div>`});
-h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0),isKroger=ST[s]==='Kroger';return`<table><tr><th colspan="2">${ST[s]} ${isKroger && KROGER_STORE ? '<span class="note" style="font-weight:normal">('+KROGER_STORE.name+')</span>' : ''}</th></tr>${L.map(([k,q,c])=>{const isLive=isKroger&&KROGER_LIVE_PRICES[k];const badge=isKroger?(isLive?'<span style="font-size:10px;padding:2px 5px;background:rgba(52,199,89,.2);border-radius:4px;color:#34c759;font-weight:600;margin-left:4px">LIVE</span>':'<span style="font-size:10px;padding:2px 5px;background:rgba(120,130,125,.2);border-radius:4px;color:var(--mu);margin-left:4px">ESTIMATE</span>'):'';return`<tr><td>${q} × ${PK[k][1]}${badge}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`}).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table>${isKroger?`<div style="margin:12px 0 16px;padding:12px;background:var(--ig);border:1px solid var(--gb);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Kroger Online Cart</span><span class="meta">${KROGER_STORE?KROGER_STORE.name:'Kroger Store'}</span></div><p class="note" style="margin:0 0 10px">Send whole packages to your Kroger account cart. You can then review and check out on Kroger.com or the Kroger app.</p><button class="btn btn-primary" id="btnSendKrogerCart" onclick="sendItemsToKrogerCart()" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px">🛒 Send to Kroger Cart (${L.length} items)</button><div id="krogerCartFeedback" style="display:none;margin-top:10px;font-size:13px"></div></div>`:''}<div style="height:8px"></div>`}).join('')}
+h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0),isKroger=ST[s]==='Kroger';return`<table><tr><th colspan="2">${ST[s]} ${isKroger && KROGER_STORE ? '<span class="note" style="font-weight:normal">('+KROGER_STORE.name+')</span>' : ''}</th></tr>${L.map(([k,q,c])=>{const isLive=isKroger&&KROGER_LIVE_PRICES[k];const badge=isKroger?(isLive?'<span style="font-size:10px;padding:2px 5px;background:rgba(52,199,89,.2);border-radius:4px;color:#34c759;font-weight:600;margin-left:4px">LIVE</span>':'<span style="font-size:10px;padding:2px 5px;background:rgba(120,130,125,.2);border-radius:4px;color:var(--mu);margin-left:4px">ESTIMATE</span>'):'';return`<tr><td>${q} × ${PK[k][1]}${badge}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`}).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table>${isKroger?`<div style="margin:12px 0 16px;padding:14px;background:var(--ig);border:1px solid var(--gb);border-radius:16px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:700">Kroger Online Cart</span>${KROGER_ACCOUNT_LINKED?'<span style="font-size:10px;padding:2px 7px;background:rgba(52,199,89,.2);border-radius:6px;color:#34c759;font-weight:600">● ACCOUNT LINKED</span>':'<span style="font-size:10px;padding:2px 7px;background:rgba(120,130,125,.2);border-radius:6px;color:var(--mu);font-weight:600">○ NOT LINKED</span>'}</div><div class="meta" style="font-size:12px;margin-bottom:8px">${KROGER_STORE?KROGER_STORE.name:'Kroger Store'}</div><p class="note" style="margin:0 0 10px">${KROGER_ACCOUNT_LINKED?'Your Kroger account is connected! Tap below to add these items directly to your cart.':'Link your Kroger account so BudgetBites can add grocery items straight into your cart, then check out in the in-app browser.'}</p><div style="display:flex;flex-direction:column;gap:8px"><button class="btn btn-primary" id="btnSendKrogerCart" onclick="sendItemsToKrogerCart()" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600">${KROGER_ACCOUNT_LINKED?'🛒 Add to My Kroger Cart ('+L.length+' items)':'🔗 Link Kroger Account &amp; Add Cart ('+L.length+' items)'}</button>${KROGER_ACCOUNT_LINKED?'<div style="text-align:right"><button onclick="unlinkKrogerAccount()" style="border:0;background:none;color:var(--mu);font-size:11px;text-decoration:underline;cursor:pointer">Disconnect Kroger account</button></div>':'<button class="btn" onclick="linkKrogerAccount()" style="width:100%;padding:8px;font-size:12px">Link Kroger Account First</button>'}</div><div id="krogerCartFeedback" style="display:none;margin-top:10px;font-size:13px"></div></div>`:''}<div style="height:8px"></div>`}).join('')}
 ${Object.keys(agg).some(k=>(R2.used[k]||0)>.01)?`<table><tr><th colspan="2">From your pantry</th></tr>${Object.keys(agg).filter(k=>(R2.used[k]||0)>.01).map(k=>`<tr><td>${fmt(R2.used[k]*I[k][0])} ${I[k][1]}</td><td>$0.00</td></tr>`).join('')}</table><div style="height:8px"></div>`:''}<h2 style="margin-top:6px">Store comparison</h2><table>${cmp.map(([s,c])=>`<tr><td class="${c===minC?'best':''}">${s} only${c===minC?' (cheapest single store)':''}</td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Mixing stores (best price each)</b></td><td><b>${money(R2.trip.cost)}</b></td></tr></table></div>
 <div class="card pg" data-p="week"><h2>Next 7 days</h2><table><tr><th>Day</th><th>kcal</th><th>Cost / budget</th></tr>${week.map(w=>`<tr onclick="pickDay(${w.i})" style="cursor:pointer"><td>${w.d}</td><td>${Math.round(w.c)}</td><td class="${w.over?'warn':''}">${w.first?money(w.tc)+' / '+money(w.tB)+(w.tB!==w.b?' trip':''):'from leftovers'}</td></tr>`).join('')}</table></div>`;
 $('plan').innerHTML=h;show();const b=$('bud');b.onchange=()=>{S.tb=Math.max(1,+b.value||10);save();render()}}
@@ -1137,6 +1138,7 @@ function go(p){
 let KROGER_STORE=null;
 let KROGER_LIVE_PRICES={};
 let KROGER_UPDATED_AT=null;
+let KROGER_ACCOUNT_LINKED=false;
 
 function postToNative(handler,payload){
   try{
@@ -1146,10 +1148,53 @@ function postToNative(handler,payload){
   }catch(e){console.warn('Bridge error:',e)}
 }
 
+window.onKrogerAccountStatus=function(status){
+  KROGER_ACCOUNT_LINKED=!!status.linked;
+  if(status.message) showToast(status.message);
+  if(status.error) showToast(status.error);
+  updateKrogerAccountUI();
+  render();
+};
+
+function linkKrogerAccount(){
+  triggerHaptic('selection');
+  showToast("Opening Kroger sign-in sheet...");
+  postToNative('kroger',{action:'linkAccount'});
+}
+
+function unlinkKrogerAccount(){
+  triggerHaptic('light');
+  if(confirm("Disconnect your Kroger account from BudgetBites?")){
+    postToNative('kroger',{action:'unlinkAccount'});
+  }
+}
+
+function updateKrogerAccountUI(){
+  const accEl=$('krogerStepAccountArea');
+  if(accEl){
+    if(KROGER_ACCOUNT_LINKED){
+      accEl.innerHTML=`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(52,199,89,.12);border:1px solid rgba(52,199,89,.3);border-radius:10px">
+          <span style="font-size:12px;color:#34c759;font-weight:600">● Kroger Account Linked</span>
+          <button class="btn" onclick="unlinkKrogerAccount()" style="font-size:11px;padding:3px 8px">Disconnect</button>
+        </div>
+      `;
+    }else{
+      accEl.innerHTML=`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--ig);border:1px solid var(--gb);border-radius:10px">
+          <span class="meta" style="font-size:12px">Link account to sync cart:</span>
+          <button class="btn btn-primary" onclick="linkKrogerAccount()" style="font-size:11px;padding:4px 10px">Link Kroger Account</button>
+        </div>
+      `;
+    }
+  }
+}
+
 window.onKrogerStoreLoaded=function(store){
   if(store){
     KROGER_STORE=store;
     updateKrogerStoreUI();
+    updateKrogerAccountUI();
   }
 };
 
@@ -1179,6 +1224,7 @@ window.onKrogerPricesLoaded=function(data){
     showToast("Live Kroger prices loaded!");
     render();
     updateKrogerStoreUI();
+    updateKrogerAccountUI();
   }
 };
 
@@ -1194,18 +1240,20 @@ window.onKrogerCartStatus=function(res){
   fb.style.display='block';
   if(res.success){
     triggerHaptic('success');
+    KROGER_ACCOUNT_LINKED=true;
+    updateKrogerAccountUI();
     fb.innerHTML=`
-      <div style="background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.3);border-radius:10px;padding:10px;text-align:center">
-        <b style="color:#34c759;display:block;margin-bottom:4px">✓ ${res.count||''} Items Added to Kroger Cart!</b>
-        <p style="font-size:12px;margin:0 0 8px;color:var(--tx)">Review your items on Kroger.com or the Kroger app to check out.</p>
-        <button class="btn btn-primary" onclick="openKrogerCartApp()" style="padding:8px 14px;font-size:13px">Open Kroger Cart to Check Out →</button>
+      <div style="background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.3);border-radius:12px;padding:14px;text-align:center">
+        <b style="color:#34c759;display:block;margin-bottom:4px;font-size:14px">✓ ${res.count||''} Items Added to Your Kroger Cart!</b>
+        <p style="font-size:12px;margin:0 0 10px;color:var(--tx)">Items are synced to your personal account. Review and check out directly in the in-app browser:</p>
+        <button class="btn btn-primary" onclick="openKrogerCartApp()" style="padding:10px 16px;font-size:13px;font-weight:600;width:100%">🛍️ Open In-App Browser to Check Out →</button>
       </div>
     `;
   }else{
     triggerHaptic('error');
     fb.innerHTML=`
       <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;color:#ef4444;text-align:center">
-        <b>Could not send to cart:</b> ${res.error||'Please try again.'}
+        <b>Could not add to cart:</b> ${res.error||'Please try again.'}
       </div>
     `;
   }
@@ -1293,7 +1341,7 @@ function sendItemsToKrogerCart(){
   if(btn)btn.disabled=true;
   if(fb){
     fb.style.display='block';
-    fb.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:13px">Connecting to Kroger & sending items...</div>`;
+    fb.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:13px">${KROGER_ACCOUNT_LINKED ? 'Adding items directly to your Kroger cart...' : 'Connecting to Kroger... (Opening sign-in window)'}</div>`;
   }
 
   const krogerItems=[];

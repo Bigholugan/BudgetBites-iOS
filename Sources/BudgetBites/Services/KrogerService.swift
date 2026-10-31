@@ -211,6 +211,28 @@ public final class KrogerService {
     }
     
     // MARK: - 3. Ensure Valid User Token (With Auto-Refresh)
+    public var isAccountLinked: Bool {
+        guard let token = KeychainManager.shared.getString(forKey: .accessToken), !token.isEmpty else {
+            return false
+        }
+        return true
+    }
+    
+    public func linkAccount(presentationAnchor: ASPresentationAnchor) async throws -> Bool {
+        guard hasBackend else { throw KrogerError.backendNotConfigured }
+        let _ = try await KrogerAuthManager.shared.authenticate(
+            backendBaseURL: backendBaseURL,
+            clientId: clientId,
+            redirectUri: redirectUri,
+            anchor: presentationAnchor
+        )
+        return true
+    }
+    
+    public func unlinkAccount() {
+        KeychainManager.shared.clearAllTokens()
+    }
+
     public func ensureValidToken(presentationAnchor: ASPresentationAnchor) async throws -> String {
         // Check if existing token is valid
         if let token = KeychainManager.shared.getString(forKey: .accessToken),
@@ -303,21 +325,17 @@ public final class KrogerService {
         return true
     }
     
-    // MARK: - 5. Open Kroger Cart Handoff
+    // MARK: - 5. Open In-App Browser for Kroger Cart Checkout
     public func openKrogerCart(from viewController: UIViewController) {
         let webCartURL = URL(string: "https://www.kroger.com/cart")!
-        let appCartURL = URL(string: "kroger://cart")!
-        
-        // Try opening native Kroger app if installed
-        if UIApplication.shared.canOpenURL(appCartURL) {
-            UIApplication.shared.open(appCartURL, options: [:], completionHandler: nil)
-            return
-        }
-        
-        // Otherwise present SFSafariViewController
         let safariVC = SFSafariViewController(url: webCartURL)
         safariVC.modalPresentationStyle = .pageSheet
-        safariVC.dismissButtonStyle = .close
-        viewController.present(safariVC, animated: true, completion: nil)
+        safariVC.dismissButtonStyle = .done
+        
+        var targetVC = viewController
+        while let presented = targetVC.presentedViewController, !presented.isBeingDismissed {
+            targetVC = presented
+        }
+        targetVC.present(safariVC, animated: true, completion: nil)
     }
 }
