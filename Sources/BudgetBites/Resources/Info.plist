@@ -54,5 +54,11 @@
 	<array>
 		<string>kroger</string>
 	</array>
+	<key>KROGER_BACKEND_URL</key>
+	<string>https://budgetbites-api-5ao9.onrender.com</string>
+	<key>KROGER_CLIENT_ID</key>
+	<string>budgetbitesapp-bbcjy2t0</string>
+	<key>KROGER_REDIRECT_URI</key>
+	<string>https://budgetbites-api-5ao9.onrender.com/callback</string>
 </dict>
 </plist>

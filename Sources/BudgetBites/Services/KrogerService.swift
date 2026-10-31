@@ -44,9 +44,9 @@ public final class KrogerService {
     public static let shared = KrogerService()
     
     // Configurable backend URL (defaults to production backend or local)
-    public var backendBaseURL: String = ""
-    public var clientId: String = "budgetbites-client-id"
-    public var redirectUri: String = ""
+    public var backendBaseURL: String = "https://budgetbites-api-5ao9.onrender.com"
+    public var clientId: String = "budgetbitesapp-bbcjy2t0"
+    public var redirectUri: String = "https://budgetbites-api-5ao9.onrender.com/callback"
     
     private let urlSession = URLSession.shared
     
