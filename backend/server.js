@@ -360,10 +360,26 @@ app.put('/api/kroger/cart', async (req, res) => {
       return res.status(400).json({ error: 'items array is required (each item must have upc and quantity).' });
     }
 
-    const formattedItems = items.map(it => ({
-      upc: String(it.upc).padStart(13, '0'), // Kroger standard 13-digit format
-      quantity: Math.max(1, parseInt(it.quantity, 10) || 1)
-    }));
+    const formattedItems = items
+      .filter(it => it.upc && String(it.upc).trim().length > 0)
+      .map(it => {
+        let cleanUpc = String(it.upc).replace(/\D/g, ''); // digits only
+        if (cleanUpc.length > 0 && cleanUpc.length < 13) {
+          cleanUpc = cleanUpc.padStart(13, '0');
+        }
+        return {
+          upc: cleanUpc,
+          quantity: Math.max(1, parseInt(it.quantity, 10) || 1),
+          modality: it.modality || 'PICKUP'
+        };
+      })
+      .filter(it => it.upc.length === 13);
+
+    if (!formattedItems.length) {
+      return res.status(400).json({ error: 'No valid UPCs could be found for items to send to Kroger cart.' });
+    }
+
+    console.log(`Sending ${formattedItems.length} items to Kroger Cart API:`, JSON.stringify(formattedItems));
 
     const response = await fetch(`${KROGER_BASE_URL}/cart/add`, {
       method: 'PUT',
@@ -377,7 +393,13 @@ app.put('/api/kroger/cart', async (req, res) => {
 
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(response.status).json({ error: `Kroger Cart API error (${response.status}): ${errText}` });
+      console.error(`Kroger Cart API failed (${response.status}):`, errText);
+      let parsedMsg = errText;
+      try {
+        const errObj = JSON.parse(errText);
+        parsedMsg = errObj.error_description || errObj.error || errText;
+      } catch (e) {}
+      return res.status(response.status).json({ error: `Kroger Cart (${response.status}): ${parsedMsg}` });
     }
 
     res.status(200).json({

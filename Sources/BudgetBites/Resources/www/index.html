@@ -1334,6 +1334,46 @@ function renderKrogerStoresList(stores){
   `).join('');
 }
 
+const DEFAULT_KROGER_UPCS = {
+  eggs: "0001111086022",
+  oats: "0001111089332",
+  banana: "0000000004011",
+  milk: "0001111041600",
+  yog: "0001111087405",
+  chick: "0001111041010",
+  turk: "0001111097241",
+  tuna: "0001111085315",
+  bean: "0001111084223",
+  lent: "0001111086111",
+  rice: "0001111085445",
+  bread: "0001111086300",
+  sweet: "0000000004074",
+  pasta: "0001111085521",
+  broc: "0001111086432",
+  spin: "0001111086445",
+  mix: "0001111086460",
+  carrot: "0001111084700",
+  tom: "0001111084200",
+  onion: "0000000004082",
+  pb: "0001111086500",
+  oil: "0001111085112",
+  apple: "0000000004131",
+  ched: "0001111085600",
+  tort: "0001111085710",
+  whey: "0001111085800",
+  cott: "0001111085900",
+  berry: "0001111086480",
+  salmon: "0001111085950",
+  avocado: "0000000004046",
+  almond: "0001111086600",
+  quinoa: "0001111086700",
+  tea: "0001111086800",
+  coffee: "0001111086900",
+  sparkling: "0001111087000",
+  soda: "0001111087100",
+  wine: "0001111087200"
+};
+
 function sendItemsToKrogerCart(){
   triggerHaptic('selection');
   const btn=$('btnSendKrogerCart');
@@ -1346,17 +1386,29 @@ function sendItemsToKrogerCart(){
 
   const krogerItems=[];
   const R2=RS[S.day];
-  if(R2&&R2.packs){
-    for(const k in R2.packs){
-      if(PC[k]&&PC[k].s===2&&R2.packs[k]>0){
+  const packs=(R2&&R2.packs)?R2.packs:(R2&&R2.trip&&R2.trip.packs?R2.trip.packs:{});
+
+  for(const k in packs){
+    const qty=packs[k];
+    if(qty>0){
+      const isKroger=(PC[k]&&ST[PC[k].s]==='Kroger')||(S.st&&S.st[2]);
+      if(isKroger){
         const live=KROGER_LIVE_PRICES[k];
-        const upc=(live&&live.upc)?live.upc:'';
-        krogerItems.push({
-          upc:upc||k,
-          quantity:R2.packs[k]
-        });
+        const upc=(live&&live.upc&&live.upc.length>=10)?live.upc:(DEFAULT_KROGER_UPCS[k]||'');
+        if(upc){
+          krogerItems.push({
+            upc:upc,
+            quantity:qty
+          });
+        }
       }
     }
+  }
+
+  if(!krogerItems.length){
+    if(btn)btn.disabled=false;
+    if(fb)fb.innerHTML=`<div style="color:var(--warn);text-align:center;padding:8px;font-size:13px">No Kroger grocery items found for this trip.</div>`;
+    return;
   }
 
   postToNative('kroger',{action:'sendCart',items:krogerItems});

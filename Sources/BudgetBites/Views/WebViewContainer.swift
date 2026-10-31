@@ -181,8 +181,8 @@ struct WebViewContainer: UIViewRepresentable {
                     }
 
                 case "sendCart":
-                    guard let rawItems = dict["items"] as? [[String: Any]] else {
-                        self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: false, error: 'No items provided' });")
+                    guard let rawItems = dict["items"] as? [[String: Any]], !rawItems.isEmpty else {
+                        self.sendCartStatus(success: false, count: 0, error: "No items provided to send to cart.")
                         return
                     }
                     let items = rawItems.compactMap { it -> KrogerCartItem? in
@@ -191,19 +191,23 @@ struct WebViewContainer: UIViewRepresentable {
                         return KrogerCartItem(upc: upc, quantity: qty)
                     }
 
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let anchor = windowScene.windows.first(where: { $0.isKeyWindow }) else {
-                        self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: false, error: 'Unable to present authentication window' });")
+                    guard !items.isEmpty else {
+                        self.sendCartStatus(success: false, count: 0, error: "No items with valid UPC codes to send.")
+                        return
+                    }
+
+                    guard let windowScene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first(where: { $0.activationState == .foregroundActive }) ?? UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let anchor = windowScene.windows.first(where: { $0.isKeyWindow }) ?? windowScene.windows.first else {
+                        self.sendCartStatus(success: false, count: 0, error: "Unable to present sign-in window.")
                         return
                     }
 
                     do {
                         let success = try await KrogerService.shared.addToCart(items: items, presentationAnchor: anchor)
-                        self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: \(success), count: \(items.count) });")
+                        self.sendCartStatus(success: success, count: items.count, error: nil)
                         self.evaluateJS("window.onKrogerAccountStatus && window.onKrogerAccountStatus({ linked: true });")
                     } catch {
-                        let errMsg = error.localizedDescription.replacingOccurrences(of: "'", with: "\\'")
-                        self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus({ success: false, error: '\(errMsg)' });")
+                        self.sendCartStatus(success: false, count: 0, error: error.localizedDescription)
                     }
 
                 case "openCart":
@@ -230,6 +234,21 @@ struct WebViewContainer: UIViewRepresentable {
                 top = presented
             }
             return top
+        }
+
+        @MainActor
+        private func sendCartStatus(success: Bool, count: Int, error: String?) {
+            var payload: [String: Any] = [
+                "success": success,
+                "count": count
+            ]
+            if let error = error {
+                payload["error"] = error
+            }
+            if let data = try? JSONSerialization.data(withJSONObject: payload),
+               let jsonString = String(data: data, encoding: .utf8) {
+                self.evaluateJS("window.onKrogerCartStatus && window.onKrogerCartStatus(\(jsonString));")
+            }
         }
 
         private func loadPricesForStore(locationId: String) {
