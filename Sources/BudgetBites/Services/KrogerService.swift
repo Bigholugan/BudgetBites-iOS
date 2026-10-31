@@ -64,15 +64,15 @@ public final class KrogerService {
         // Load default backend URL from Info.plist if configured
         if let customBackend = Bundle.main.object(forInfoDictionaryKey: "KROGER_BACKEND_URL") as? String,
            !customBackend.isEmpty {
-            self.backendBaseURL = customBackend
+            self.backendBaseURL = customBackend.trimmingCharacters(in: CharacterSet(charactersIn: "/ \t\n\r"))
         }
         if let customClientId = Bundle.main.object(forInfoDictionaryKey: "KROGER_CLIENT_ID") as? String,
            !customClientId.isEmpty {
-            self.clientId = customClientId
+            self.clientId = customClientId.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         if let customRedirect = Bundle.main.object(forInfoDictionaryKey: "KROGER_REDIRECT_URI") as? String,
            !customRedirect.isEmpty {
-            self.redirectUri = customRedirect
+            self.redirectUri = customRedirect.trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
     

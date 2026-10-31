@@ -63,12 +63,15 @@ public final class KrogerAuthManager: NSObject, ASWebAuthenticationPresentationC
         let challenge = Self.generateCodeChallenge(from: verifier)
         let state = UUID().uuidString
         
+        let cleanRedirect = redirectUri.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanClientId = clientId.trimmingCharacters(in: .whitespacesAndNewlines)
+        
         var components = URLComponents(string: "https://api.kroger.com/v1/connect/oauth2/authorize")!
         components.queryItems = [
             URLQueryItem(name: "scope", value: "cart.basic:write profile.compact"),
             URLQueryItem(name: "response_type", value: "code"),
-            URLQueryItem(name: "client_id", value: clientId),
-            URLQueryItem(name: "redirect_uri", value: redirectUri),
+            URLQueryItem(name: "client_id", value: cleanClientId),
+            URLQueryItem(name: "redirect_uri", value: cleanRedirect),
             URLQueryItem(name: "code_challenge", value: challenge),
             URLQueryItem(name: "code_challenge_method", value: "S256"),
             URLQueryItem(name: "state", value: state)
