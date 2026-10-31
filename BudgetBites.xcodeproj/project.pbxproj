@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		AA0000012CE8000100000001 /* BudgetBitesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000001 /* BudgetBitesApp.swift */; };
 		AA0000012CE8000100000002 /* WebViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000002 /* WebViewContainer.swift */; };
+		AA0000012CE8000100000011 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000011 /* KeychainManager.swift */; };
+		AA0000012CE8000100000012 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000012 /* LocationManager.swift */; };
+		AA0000012CE8000100000013 /* SizeToServingsConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000013 /* SizeToServingsConverter.swift */; };
+		AA0000012CE8000100000014 /* KrogerAuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000014 /* KrogerAuthManager.swift */; };
+		AA0000012CE8000100000015 /* KrogerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000015 /* KrogerService.swift */; };
 		AA0000012CE8000100000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000003 /* Assets.xcassets */; };
 		AA0000012CE8000100000004 /* www in Resources */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000004 /* www */; };
 		AA0000012CE8000100000005 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000022CE8000100000005 /* WebKit.framework */; };
@@ -18,6 +23,11 @@
 		AA0000032CE8000100000001 /* BudgetBites.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BudgetBites.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000022CE8000100000001 /* BudgetBitesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetBitesApp.swift; sourceTree = "<group>"; };
 		AA0000022CE8000100000002 /* WebViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/WebViewContainer.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000011 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/KeychainManager.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000012 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/LocationManager.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000013 /* SizeToServingsConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/SizeToServingsConverter.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000014 /* KrogerAuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/KrogerAuthManager.swift; sourceTree = "<group>"; };
+		AA0000022CE8000100000015 /* KrogerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/KrogerService.swift; sourceTree = "<group>"; };
 		AA0000022CE8000100000003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		AA0000022CE8000100000004 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources/www; sourceTree = "<group>"; };
 		AA0000022CE8000100000005 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -50,6 +60,11 @@
 			children = (
 				AA0000022CE8000100000001 /* BudgetBitesApp.swift */,
 				AA0000022CE8000100000002 /* WebViewContainer.swift */,
+				AA0000022CE8000100000011 /* KeychainManager.swift */,
+				AA0000022CE8000100000012 /* LocationManager.swift */,
+				AA0000022CE8000100000013 /* SizeToServingsConverter.swift */,
+				AA0000022CE8000100000014 /* KrogerAuthManager.swift */,
+				AA0000022CE8000100000015 /* KrogerService.swift */,
 				AA0000022CE8000100000003 /* Assets.xcassets */,
 				AA0000022CE8000100000004 /* www */,
 				AA0000022CE8000100000006 /* Info.plist */,
@@ -145,6 +160,11 @@
 			files = (
 				AA0000012CE8000100000001 /* BudgetBitesApp.swift in Sources */,
 				AA0000012CE8000100000002 /* WebViewContainer.swift in Sources */,
+				AA0000012CE8000100000011 /* KeychainManager.swift in Sources */,
+				AA0000012CE8000100000012 /* LocationManager.swift in Sources */,
+				AA0000012CE8000100000013 /* SizeToServingsConverter.swift in Sources */,
+				AA0000012CE8000100000014 /* KrogerAuthManager.swift in Sources */,
+				AA0000012CE8000100000015 /* KrogerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

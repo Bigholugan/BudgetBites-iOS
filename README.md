@@ -93,3 +93,57 @@ This repository includes a ready-to-run GitHub Actions workflow in `.github/work
 3. **Instant Safari Web Clip (Zero compile, right now)**:
    - Run `python -m http.server 8080` inside `Sources/BudgetBites/Resources/www`.
    - Open `http://<YOUR_PC_IP>:8080` in Safari on your iPhone, tap Share -> "Add to Home Screen".
+
+---
+
+## 🛒 Live Kroger Pricing & "Send to Kroger Cart" Setup
+
+BudgetBites integrates directly with the Kroger Developer Platform to provide **live localized product pricing**, **package size conversion**, and **OAuth2 cart sync**.
+
+### 1. Kroger Developer Portal App Setup
+1. Go to [Kroger Developer Portal](https://developer.kroger.com/) and register or log in.
+2. Under **My Apps**, click **Create New App**.
+3. Fill in the app details:
+   - **App Name**: `BudgetBites`
+   - **Scopes**: Select `product.compact`, `cart.basic:write`, and `profile.compact`.
+   - **Redirect URI**: Set to your backend's HTTPS universal link callback endpoint:
+     `https://your-backend-domain.com/callback` (must be exact match, HTTPS).
+4. Save the generated **Client ID** and **Client Secret**.
+
+### 2. Backend Deployment & Environment Variables
+The client secret is never stored on the iOS device. A secure backend microservice is included in `/backend`.
+
+1. Deploy the `backend/` directory to your hosting provider (Vercel, Render, Railway, AWS Lambda, or Docker):
+   ```bash
+   cd backend
+   npm install
+   ```
+2. Configure environment variables on your server:
+   | Variable | Description |
+   |---|---|
+   | `KROGER_CLIENT_ID` | Your Kroger App Client ID |
+   | `KROGER_CLIENT_SECRET` | Your Kroger App Client Secret (never put this in iOS app) |
+   | `KROGER_REDIRECT_URI` | `https://your-backend-domain.com/callback` |
+   | `APPLE_APP_ID` | `<TeamID>.<BundleIdentifier>` (e.g. `TEAM123456.com.budgetbites.app`) |
+   | `PORT` | `3000` (or default port) |
+   | `SESSION_SECRET` | Random 32+ character secret for session signing |
+
+3. Verify Universal Link association:
+   - Visit `https://your-backend-domain.com/.well-known/apple-app-site-association` in your browser. It should return the JSON payload specifying `paths: ["/callback", "/callback/*"]`.
+
+### 3. Xcode Associated Domains & Backend URL
+1. In Xcode, select the **BudgetBites** target > **Signing & Capabilities**.
+2. Click **+ Capability** and add **Associated Domains**.
+3. Add: `applinks:your-backend-domain.com`.
+4. In `Info.plist`, set `KROGER_BACKEND_URL` to `https://your-backend-domain.com` and `KROGER_CLIENT_ID` to your Client ID.
+
+### 4. Testing with a Kroger Test Account
+1. Open BudgetBites and proceed to **Step 5** of the setup or the **Shop** tab.
+2. In the **Live Kroger Pricing** card, enter a ZIP code (e.g., `45202` for Cincinnati / Kroger HQ) or tap **📍 Use My Current Location**.
+3. Select your local store. The app queries the Kroger Products API via your backend and converts package sizes to servings, showing green **LIVE** price badges on matching items.
+4. Go to the **Shop** tab: whole packages assigned to Kroger display an active **🛒 Send to Kroger Cart** button.
+5. Tap **Send to Kroger Cart**. The app opens `ASWebAuthenticationSession` with PKCE.
+6. Sign in with a Kroger customer or developer test account.
+7. Upon successful authentication, items are added to your Kroger cart.
+8. Tap **Open My Kroger Cart to Check Out** to review your items directly on Kroger.com or in the native Kroger iOS app!
+

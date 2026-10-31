@@ -48,5 +48,11 @@
 	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>BudgetBites needs your location to find nearby Kroger grocery stores and get live local prices.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>kroger</string>
+	</array>
 </dict>
 </plist>

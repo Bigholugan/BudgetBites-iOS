@@ -23,6 +23,11 @@ let package = Package(
                 .copy("Resources/www"),
                 .copy("Resources/Info.plist")
             ]
+        ),
+        .testTarget(
+            name: "BudgetBitesTests",
+            dependencies: ["BudgetBites"],
+            path: "Tests/BudgetBitesTests"
         )
     ]
 )

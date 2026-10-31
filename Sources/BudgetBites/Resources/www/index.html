@@ -575,6 +575,34 @@ td:last-child, th:last-child { text-align: right; }
       <span class="meta" style="font-weight:600;display:block;margin-bottom:8px">Preferred stores:</span>
       <span id="stores" class="row"></span>
     </div>
+
+    <!-- Kroger Live Store Selection Card -->
+    <div id="krogerStoreCard" style="margin:14px 0 10px;padding:14px;background:var(--ig);border:1px solid var(--gb);border-radius:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#34c759;box-shadow:0 0 6px #34c759"></span>
+          Live Kroger Pricing
+        </span>
+        <span id="krogerBadge" style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:var(--ac2);color:var(--ac)">KROGER API</span>
+      </div>
+      <div id="krogerSelectedStoreInfo" style="margin-bottom:6px;font-size:13px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="meta">No store selected (using estimates)</span>
+          <button class="btn btn-primary" onclick="toggleKrogerSearch()" style="font-size:12px;padding:6px 10px">Find My Store</button>
+        </div>
+      </div>
+      <div id="krogerStoreSearchBox" style="display:none;margin-top:10px;border-top:1px solid var(--gb);padding-top:10px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="krogerZipInput" type="text" placeholder="Enter ZIP Code (e.g. 45202)" maxlength="5" style="flex:1">
+          <button class="btn btn-primary" onclick="searchKrogerStores()" style="padding:9px 12px">Search</button>
+        </div>
+        <div style="margin-top:8px;text-align:center">
+          <button class="btn" onclick="useCurrentLocationForKroger()" style="font-size:12px;padding:6px 12px">📍 Use My Current Location</button>
+        </div>
+        <div id="krogerStoreResults" style="margin-top:10px;max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+
     <div style="background:var(--ig);border:1px solid var(--gb);border-radius:14px;padding:12px;margin-top:10px">
       <div style="font-size:13px;font-weight:600;margin-bottom:4px">✨ Setup Almost Complete</div>
       <div class="meta">We'll generate customized daily calorie targets, macros, rotating healthy recipes, and a grocery shopping list.</div>
@@ -971,7 +999,7 @@ ${over?`<p class="warn">Even at 60% of your calories, this budget can’t cover 
 <div class="rings">${bar('Calories',T.c,t.cal,'kcal')}${bar('Protein',T.p,t.pro,'g')}${bar('Carbs',T.cb,t.carb,'g')}${bar('Fat',T.f,t.fat,'g')}${bar('Spend',R2.trip.cost,R2.trip.B,'$')}</div></div><div class="card pg" data-p="plan"><h2>Budget breakdown</h2><table>${RS.filter(r=>r.trip===R2.trip).map(r=>`<tr><td>${DY[r.idx]}</td><td>${r.pick.m.map(x=>x.r.n).join(', ')}</td><td>${money(r.dayCost)}</td></tr>`).join('')}<tr><td colspan="2"><b>Trip total at the register</b></td><td><b>${money(R2.trip.cost)}</b></td></tr><tr><td colspan="2">Budget</td><td>${money(R2.trip.B)}</td></tr><tr><td colspan="2">${R2.trip.B>=R2.trip.cost?'Left in budget':'Over budget'}</td><td class="${R2.trip.B>=R2.trip.cost?'best':'warn'}">${money(Math.abs(R2.trip.B-R2.trip.cost))}</td></tr></table><p class="note">Each day shows its share of the packages you buy for the trip.</p></div>`;
 pick.m.forEach((x,i)=>{h+=`<div class="card meal pg" data-p="meals"><span class="tag">${x.slot}</span><h3><span>${x.r.n}</span><span class="meta">${Math.round(x.c)} kcal · ${Math.round(x.p)}g P · ${Math.round(x.cb)}g C · ${Math.round(x.f)}g F · ${money(x.m)}</span></h3>
 <ul>${Object.keys(x.q).map(k=>`<li>${fmt(x.q[k]*I[k][0]*NP())} ${I[k][1]}</li>`).join('')}</ul>${S.bev&&(S.bev!=='wine'||x.r.s===(S.meals.includes('d')?'d':S.meals[S.meals.length-1]))?`<div class="meta">🥤 ${S.bev==='water'?'Drink: water. ':''}${BSUG[S.bev]}</div>`:''}${STEPS[x.r.n]?`${stepsHTML(x.r.n)}`:`<div class="meta">${x.r.t}</div>`}</div>`});
-h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0);return`<table><tr><th colspan="2">${ST[s]}</th></tr>${L.map(([k,q,c])=>`<tr><td>${q} × ${PK[k][1]}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table><div style="height:8px"></div>`}).join('')}
+h+=`<div class="card pg" data-p="shop"><h2>Shop ${DY[R2.trip.start]}${R2.trip.len>1?' for '+DY[R2.trip.start]+'–'+DY[R2.trip.start+R2.trip.len-1]+' ('+R2.trip.len+' days)':''} (buy on the day, best prices)</h2>${S.day!==R2.trip.start?'<p class="warn">You shop for this day on '+DY[R2.trip.start]+'. Cook it from your leftovers.</p>':''}${Object.keys(by).map(s=>{const L=by[s],sub=L.reduce((a,x)=>a+x[2],0),isKroger=ST[s]==='Kroger';return`<table><tr><th colspan="2">${ST[s]} ${isKroger && KROGER_STORE ? '<span class="note" style="font-weight:normal">('+KROGER_STORE.name+')</span>' : ''}</th></tr>${L.map(([k,q,c])=>{const isLive=isKroger&&KROGER_LIVE_PRICES[k];const badge=isKroger?(isLive?'<span style="font-size:10px;padding:2px 5px;background:rgba(52,199,89,.2);border-radius:4px;color:#34c759;font-weight:600;margin-left:4px">LIVE</span>':'<span style="font-size:10px;padding:2px 5px;background:rgba(120,130,125,.2);border-radius:4px;color:var(--mu);margin-left:4px">ESTIMATE</span>'):'';return`<tr><td>${q} × ${PK[k][1]}${badge}<div class="note">use ${fmt(agg[k]*I[k][0])} ${I[k][1]}${(R2.stock[k]||0)>.01?', leftover '+fmt(R2.stock[k]*I[k][0]):''}</div></td><td>${money(c)}</td></tr>`}).join('')}<tr><td><b>Subtotal</b></td><td><b>${money(sub)}</b></td></tr></table>${isKroger?`<div style="margin:12px 0 16px;padding:12px;background:var(--ig);border:1px solid var(--gb);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Kroger Online Cart</span><span class="meta">${KROGER_STORE?KROGER_STORE.name:'Kroger Store'}</span></div><p class="note" style="margin:0 0 10px">Send whole packages to your Kroger account cart. You can then review and check out on Kroger.com or the Kroger app.</p><button class="btn btn-primary" id="btnSendKrogerCart" onclick="sendItemsToKrogerCart()" style="width:100%;padding:12px;display:flex;align-items:center;justify-content:center;gap:6px">🛒 Send to Kroger Cart (${L.length} items)</button><div id="krogerCartFeedback" style="display:none;margin-top:10px;font-size:13px"></div></div>`:''}<div style="height:8px"></div>`}).join('')}
 ${Object.keys(agg).some(k=>(R2.used[k]||0)>.01)?`<table><tr><th colspan="2">From your pantry</th></tr>${Object.keys(agg).filter(k=>(R2.used[k]||0)>.01).map(k=>`<tr><td>${fmt(R2.used[k]*I[k][0])} ${I[k][1]}</td><td>$0.00</td></tr>`).join('')}</table><div style="height:8px"></div>`:''}<h2 style="margin-top:6px">Store comparison</h2><table>${cmp.map(([s,c])=>`<tr><td class="${c===minC?'best':''}">${s} only${c===minC?' (cheapest single store)':''}</td><td>${money(c)}</td></tr>`).join('')}<tr><td><b>Mixing stores (best price each)</b></td><td><b>${money(R2.trip.cost)}</b></td></tr></table></div>
 <div class="card pg" data-p="week"><h2>Next 7 days</h2><table><tr><th>Day</th><th>kcal</th><th>Cost / budget</th></tr>${week.map(w=>`<tr onclick="pickDay(${w.i})" style="cursor:pointer"><td>${w.d}</td><td>${Math.round(w.c)}</td><td class="${w.over?'warn':''}">${w.first?money(w.tc)+' / '+money(w.tB)+(w.tB!==w.b?' trip':''):'from leftovers'}</td></tr>`).join('')}</table></div>`;
 $('plan').innerHTML=h;show();const b=$('bud');b.onchange=()=>{S.tb=Math.max(1,+b.value||10);save();render()}}
@@ -1021,6 +1049,198 @@ function go(p){
   show();
   window.scrollTo(0,0);
 }
+
+// MARK: - Kroger API & Bridge State
+let KROGER_STORE=null;
+let KROGER_LIVE_PRICES={};
+let KROGER_UPDATED_AT=null;
+
+function postToNative(handler,payload){
+  try{
+    if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers[handler]){
+      window.webkit.messageHandlers[handler].postMessage(payload);
+    }
+  }catch(e){console.warn('Bridge error:',e)}
+}
+
+window.onKrogerStoreLoaded=function(store){
+  if(store){
+    KROGER_STORE=store;
+    updateKrogerStoreUI();
+  }
+};
+
+window.onKrogerStoresList=function(stores){
+  renderKrogerStoresList(stores);
+};
+
+window.onKrogerStoresError=function(err){
+  showToast(err);
+  const res=$('krogerStoreResults');
+  if(res)res.innerHTML=`<div style="color:#ef4444;font-size:12px;padding:8px">${err}</div>`;
+};
+
+window.onKrogerPricesLoaded=function(data){
+  KROGER_UPDATED_AT=data.updatedAt;
+  if(data.prices){
+    for(const k in data.prices){
+      const it=data.prices[k];
+      KROGER_LIVE_PRICES[k]=it;
+      if(it.pricePerServing&&I[k]){
+        I[k][8]=it.pricePerServing;
+      }
+      if(it.servings&&PK[k]){
+        PK[k][0]=it.servings;
+      }
+    }
+    showToast("Live Kroger prices loaded!");
+    render();
+    updateKrogerStoreUI();
+  }
+};
+
+window.onKrogerPricesError=function(err){
+  console.warn("Kroger prices error, using fallback estimates:",err);
+};
+
+window.onKrogerCartStatus=function(res){
+  const fb=$('krogerCartFeedback');
+  const btn=$('btnSendKrogerCart');
+  if(btn)btn.disabled=false;
+  if(!fb)return;
+  fb.style.display='block';
+  if(res.success){
+    triggerHaptic('success');
+    fb.innerHTML=`
+      <div style="background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.3);border-radius:10px;padding:10px;text-align:center">
+        <b style="color:#34c759;display:block;margin-bottom:4px">✓ ${res.count||''} Items Added to Kroger Cart!</b>
+        <p style="font-size:12px;margin:0 0 8px;color:var(--tx)">Review your items on Kroger.com or the Kroger app to check out.</p>
+        <button class="btn btn-primary" onclick="openKrogerCartApp()" style="padding:8px 14px;font-size:13px">Open Kroger Cart to Check Out →</button>
+      </div>
+    `;
+  }else{
+    triggerHaptic('error');
+    fb.innerHTML=`
+      <div style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:10px;color:#ef4444;text-align:center">
+        <b>Could not send to cart:</b> ${res.error||'Please try again.'}
+      </div>
+    `;
+  }
+};
+
+function toggleKrogerSearch(){
+  const box=$('krogerStoreSearchBox');
+  if(box)box.style.display=box.style.display==='none'?'block':'none';
+}
+
+function searchKrogerStores(){
+  const input=$('krogerZipInput');
+  const zip=input?input.value.trim():'';
+  if(!zip||zip.length<5){
+    showToast("Please enter a valid 5-digit ZIP code");
+    return;
+  }
+  const res=$('krogerStoreResults');
+  if(res)res.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:12px">Searching nearby stores...</div>`;
+  postToNative('kroger',{action:'searchStores',zipCode:zip,useGPS:false});
+}
+
+function useCurrentLocationForKroger(){
+  const res=$('krogerStoreResults');
+  if(res)res.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:12px">Locating your nearest store...</div>`;
+  postToNative('kroger',{action:'searchStores',useGPS:true});
+}
+
+function selectKrogerStore(store){
+  triggerHaptic('selection');
+  KROGER_STORE=store;
+  postToNative('kroger',{action:'selectStore',store:store});
+  toggleKrogerSearch();
+  updateKrogerStoreUI();
+  showToast("Selected: "+store.name);
+}
+
+function updateKrogerStoreUI(){
+  const info=$('krogerSelectedStoreInfo');
+  if(!info)return;
+  if(KROGER_STORE){
+    const updatedStr=KROGER_UPDATED_AT?new Date(KROGER_UPDATED_AT).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'Active';
+    info.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <b>${KROGER_STORE.name}</b> ${KROGER_STORE.distance?'<span class="meta">('+KROGER_STORE.distance+' mi)</span>':''}
+          <div class="note">${KROGER_STORE.addressLine1}, ${KROGER_STORE.city} ${KROGER_STORE.zipCode}</div>
+          <div class="meta" style="color:var(--ac);font-size:11px;margin-top:2px">✓ Live pricing active · Updated ${updatedStr}</div>
+        </div>
+        <button class="btn" onclick="toggleKrogerSearch()" style="font-size:11px;padding:5px 8px">Change</button>
+      </div>
+    `;
+  }else{
+    info.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="meta">No store selected (using estimates)</span>
+        <button class="btn btn-primary" onclick="toggleKrogerSearch()" style="font-size:12px;padding:6px 10px">Find My Store</button>
+      </div>
+    `;
+  }
+}
+
+function renderKrogerStoresList(stores){
+  const res=$('krogerStoreResults');
+  if(!res)return;
+  if(!stores||!stores.length){
+    res.innerHTML=`<div style="font-size:12px;color:var(--mu);padding:8px;text-align:center">No Kroger stores found in this area.</div>`;
+    return;
+  }
+  res.innerHTML=stores.map((s)=>`
+    <div onclick='selectKrogerStore(${JSON.stringify(s)})' style="cursor:pointer;padding:8px 10px;background:var(--card);border:1px solid var(--gb);border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <b style="font-size:13px">${s.name}</b> ${s.distance?'<span class="note">('+s.distance+' mi)</span>':''}
+        <div class="note" style="font-size:11px">${s.addressLine1}, ${s.city}</div>
+      </div>
+      <button class="btn" style="font-size:11px;padding:4px 8px">Select</button>
+    </div>
+  `).join('');
+}
+
+function sendItemsToKrogerCart(){
+  triggerHaptic('selection');
+  const btn=$('btnSendKrogerCart');
+  const fb=$('krogerCartFeedback');
+  if(btn)btn.disabled=true;
+  if(fb){
+    fb.style.display='block';
+    fb.innerHTML=`<div style="text-align:center;padding:8px;color:var(--mu);font-size:13px">Connecting to Kroger & sending items...</div>`;
+  }
+
+  const krogerItems=[];
+  const R2=RS[S.day];
+  if(R2&&R2.packs){
+    for(const k in R2.packs){
+      if(PC[k]&&PC[k].s===2&&R2.packs[k]>0){
+        const live=KROGER_LIVE_PRICES[k];
+        const upc=(live&&live.upc)?live.upc:'';
+        krogerItems.push({
+          upc:upc||k,
+          quantity:R2.packs[k]
+        });
+      }
+    }
+  }
+
+  postToNative('kroger',{action:'sendCart',items:krogerItems});
+}
+
+function openKrogerCartApp(){
+  triggerHaptic('light');
+  postToNative('kroger',{action:'openCart'});
+}
+
+window.addEventListener('NativeBridgeReady',function(){
+  postToNative('kroger',{action:'init'});
+});
+
 setStep(1);
 render();
+postToNative('kroger',{action:'init'});
 </script></body></html>
