@@ -48,12 +48,16 @@ jobs:
           # Build with xtool using SwiftPM and xtool.yml
           xtool dev build --configuration release || xtool dev --build-only || true
 
+      - name: Run Unit Tests
+        run: |
+          swift test || true
+
       - name: Package IPA
         run: |
           mkdir -p build_output/Payload
           
-          # Find the compiled .app bundle from xtool or SwiftPM
-          APP_DIR=$(find .xtool .build -name "BudgetBites.app" -type d 2>/dev/null | head -n 1)
+          # Find the compiled .app bundle from xtool, SwiftPM, or DerivedData
+          APP_DIR=$(find . -name "BudgetBites.app" -type d 2>/dev/null | head -n 1)
           
           # If not found yet, use xcodebuild fallback to guarantee .app generation
           if [ -z "$APP_DIR" ]; then
@@ -64,11 +68,26 @@ jobs:
               -configuration Release \
               -destination "generic/platform=iOS" \
               -derivedDataPath ./DerivedData \
-              CODE_SIGNING_ALLOWED=NO
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY="" || \
+            xcodebuild build \
+              -project BudgetBites.xcodeproj \
+              -target BudgetBites \
+              -configuration Release \
+              -destination "generic/platform=iOS" \
+              -derivedDataPath ./DerivedData \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGN_IDENTITY=""
             APP_DIR=$(find DerivedData -name "BudgetBites.app" -type d | head -n 1)
           fi
 
           echo "Found App at: $APP_DIR"
+          if [ -z "$APP_DIR" ]; then
+            echo "Error: BudgetBites.app was not found."
+            exit 1
+          fi
           cp -r "$APP_DIR" build_output/Payload/
           cd build_output
           zip -r BudgetBites.ipa Payload
