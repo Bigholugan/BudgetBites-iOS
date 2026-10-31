@@ -56,27 +56,27 @@ jobs:
         run: |
           mkdir -p build_output/Payload
           
-          # Find the compiled .app bundle from xtool, SwiftPM, or DerivedData
+          # Check if an IPA was produced directly by xtool
+          EXISTING_IPA=$(find . -name "*.ipa" -not -path "./build_output/*" 2>/dev/null | head -n 1)
+          if [ -n "$EXISTING_IPA" ]; then
+            echo "Found existing IPA at: $EXISTING_IPA"
+            cp "$EXISTING_IPA" build_output/BudgetBites.ipa
+          fi
+
+          # Find the compiled .app bundle from xtool or SwiftPM
           APP_DIR=$(find . -name "BudgetBites.app" -type d 2>/dev/null | head -n 1)
           
-          # If not found yet, use xcodebuild fallback to guarantee .app generation
+          # If not found yet, use xcodebuild to build the app bundle
           if [ -z "$APP_DIR" ]; then
-            echo "Packaging via xcodebuild fallback..."
-            xcodebuild build \
+            echo "Building via xcodebuild..."
+            xcodebuild clean build \
               -project BudgetBites.xcodeproj \
               -scheme BudgetBites \
               -configuration Release \
+              -sdk iphoneos \
               -destination "generic/platform=iOS" \
               -derivedDataPath ./DerivedData \
-              CODE_SIGNING_ALLOWED=NO \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGN_IDENTITY="" || \
-            xcodebuild build \
-              -project BudgetBites.xcodeproj \
-              -target BudgetBites \
-              -configuration Release \
-              -destination "generic/platform=iOS" \
-              -derivedDataPath ./DerivedData \
+              CODE_SIGN_STYLE=Manual \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO \
               CODE_SIGN_IDENTITY=""
@@ -84,14 +84,18 @@ jobs:
           fi
 
           echo "Found App at: $APP_DIR"
-          if [ -z "$APP_DIR" ]; then
-            echo "Error: BudgetBites.app was not found."
+          if [ -n "$APP_DIR" ]; then
+            cp -r "$APP_DIR" build_output/Payload/
+            if [ ! -f "build_output/BudgetBites.ipa" ]; then
+              cd build_output
+              zip -r BudgetBites.ipa Payload
+              cd ..
+            fi
+            echo "Created BudgetBites.ipa"
+          elif [ ! -f "build_output/BudgetBites.ipa" ]; then
+            echo "Error: Neither BudgetBites.app nor BudgetBites.ipa was found."
             exit 1
           fi
-          cp -r "$APP_DIR" build_output/Payload/
-          cd build_output
-          zip -r BudgetBites.ipa Payload
-          echo "Created BudgetBites.ipa"
 
       - name: Code Sign IPA (if Apple Certificate secrets exist)
         if: ${{ env.BUILD_CERTIFICATE_BASE64 != '' }}
